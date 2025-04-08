@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mr_blue/src/presentation/login/verify_otp.dart';
-import 'package:mr_blue/src/presentation/splash/splash.dart';
+import 'package:mr_blue/src/presentation/home/bottom_navigation.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,8 +17,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Gotu',
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      // home: VerifyOtpScreen("1234"),
-      home: const SplashScreen(),
+      home: Bottomnavigation(),
     );
   }
 }

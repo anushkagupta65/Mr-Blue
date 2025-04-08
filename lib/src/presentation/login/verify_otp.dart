@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mr_blue/src/presentation/login/login.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
 class VerifyOtpScreen extends StatefulWidget {
