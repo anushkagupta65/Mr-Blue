@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/home/home_screen.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:mr_blue/src/presentation/setting/settings.dart';
 
 class Bottomnavigation extends StatefulWidget {
   const Bottomnavigation({super.key});
@@ -12,7 +12,7 @@ class Bottomnavigation extends StatefulWidget {
 
 class _BottomnavigationState extends State<Bottomnavigation> {
   int _selectedIndex = 0;
-  final List<Widget> _pages = [HomeScreen()];
+  final List<Widget> _pages = [HomeScreen(), Setting()];
 
   void _onItemTapped(int index) {
     if (index == 0 || index == 1) {
@@ -20,41 +20,10 @@ class _BottomnavigationState extends State<Bottomnavigation> {
         _selectedIndex = index;
       });
     } else if (index == 2) {
-      // call();
+      // directCall();
+      call("9555900059");
     } else if (index == 3) {
-      // openWhatsApp();
-    }
-  }
-
-  Future<void> openWhatsApp() async {
-    final Uri whatsappUri = Uri.parse('https://wa.me/7011744407');
-    try {
-      if (await canLaunchUrl(whatsappUri)) {
-        await launchUrl(whatsappUri);
-      } else {
-        throw 'Could not launch WhatsApp';
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
-
-  Future<void> call() async {
-    final Uri telUri = Uri(scheme: 'tel', path: '8588882929');
-    final status = await Permission.phone.request();
-
-    if (status.isGranted) {
-      try {
-        if (await canLaunchUrl(telUri)) {
-          await launchUrl(telUri);
-        } else {
-          throw 'Could not launch dialer';
-        }
-      } catch (e) {
-        print('Error: $e');
-      }
-    } else {
-      print('Phone permission denied');
+      openWhatsApp();
     }
   }
 
@@ -92,8 +61,8 @@ class _BottomnavigationState extends State<Bottomnavigation> {
           ),
         ],
         currentIndex: _selectedIndex,
-        onTap: (int) {
-          _onItemTapped(int);
+        onTap: (val) {
+          _onItemTapped(val);
         },
         type: BottomNavigationBarType.fixed,
       ),
