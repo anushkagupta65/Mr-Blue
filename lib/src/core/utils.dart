@@ -5,6 +5,28 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+Widget customDivider() {
+  return Divider(color: Colors.blue.shade100, height: 0.4);
+}
+
+dynamic customAppBar() {
+  return AppBar(
+    backgroundColor: Colors.blue.shade700,
+    title: Center(
+      child: Text(
+        'mr. blue',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ),
+    centerTitle: true,
+    iconTheme: IconThemeData(color: Colors.white),
+  );
+}
+
 void showToastMessage(String message) {
   Fluttertoast.showToast(
     msg: message,

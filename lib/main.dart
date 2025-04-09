@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mr_blue/src/presentation/home/bottom_navigation.dart';
+import 'package:mr_blue/src/presentation/splash/splash.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Poppins',
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue.shade700),
       ),
-      home: Bottomnavigation(),
+      home: SplashScreen(),
     );
   }
 }

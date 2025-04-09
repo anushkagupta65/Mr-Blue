@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mr_blue/src/core/utils.dart';
+import 'package:mr_blue/src/presentation/drawer/drawer.dart';
 
 class Setting extends StatefulWidget {
   const Setting({super.key});
@@ -16,21 +17,8 @@ class _SettingState extends State<Setting> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue.shade700,
-        title: Center(
-          child: Text(
-            'Mr BLUE',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        centerTitle: true,
-        iconTheme: IconThemeData(color: Colors.white),
-      ),
+      appBar: customAppBar(),
+      drawer: CustomDrawer(),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -55,7 +43,9 @@ class _SettingState extends State<Setting> {
                 leading: Icon(Icons.person_outline, color: blueColor),
               ),
             ),
-            Divider(),
+            const SizedBox(height: 10),
+            customDivider(),
+            const SizedBox(height: 10),
             InkWell(
               onTap: () {
                 // Navigator.push(
@@ -68,7 +58,9 @@ class _SettingState extends State<Setting> {
                 leading: Icon(Icons.location_on_outlined, color: blueColor),
               ),
             ),
-            Divider(),
+            const SizedBox(height: 10),
+            customDivider(),
+            const SizedBox(height: 10),
             InkWell(
               onTap: () {
                 // Navigator.push(
@@ -81,7 +73,9 @@ class _SettingState extends State<Setting> {
                 leading: Icon(Icons.article_outlined, color: blueColor),
               ),
             ),
-            Divider(),
+            const SizedBox(height: 10),
+            customDivider(),
+            const SizedBox(height: 10),
             InkWell(
               onTap: () {
                 // directCall();
@@ -92,7 +86,9 @@ class _SettingState extends State<Setting> {
                 leading: Icon(Icons.call, color: blueColor),
               ),
             ),
-            Divider(),
+            const SizedBox(height: 10),
+            customDivider(),
+            const SizedBox(height: 10),
             InkWell(
               onTap: () {
                 shareApplication();

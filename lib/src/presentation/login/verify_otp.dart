@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mr_blue/src/core/utils.dart';
+import 'package:mr_blue/src/presentation/home/bottom_navigation.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
 class VerifyOtpScreen extends StatefulWidget {
@@ -12,6 +14,17 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
   String _otp = "";
   int? userId;
   final TextEditingController _otpController = TextEditingController();
+
+  void _verifyOtp() {
+    if (_otp == "1234") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Bottomnavigation()),
+      );
+    } else {
+      showToastMessage("Please enter valid OTP");
+    }
+  }
 
   // @override
   // void initState() {
@@ -101,23 +114,6 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   leading: IconButton(
-      //     onPressed: () {
-      //       Navigator.pushReplacement(
-      //         context,
-      //         MaterialPageRoute(builder: (context) => const LoginScreen()),
-      //       );
-      //     },
-      //     icon: const Icon(Icons.arrow_back, color: Colors.white),
-      //   ),
-      //   title: Text(
-      //     'OTP Verification',
-      //     // style: GoogleFonts.barlow(color: Colors.white),
-      //   ),
-      //   backgroundColor: Colors.black,
-      //   elevation: 0,
-      // ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -127,88 +123,114 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
             end: Alignment.bottomCenter,
             colors: [Colors.blue.shade100, Colors.blue.shade700],
           ),
+          image: DecorationImage(
+            colorFilter: ColorFilter.mode(
+              Colors.black.withOpacity(0.5),
+              BlendMode.dstATop,
+            ),
+            image: AssetImage("assets/images/login_screen.png"),
+            fit: BoxFit.cover,
+          ),
         ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  'Please enter OTP sent on your mobile number.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w800,
-                    color: Colors.black,
-                    letterSpacing: 1,
-                    fontSize: 16,
-                  ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 28.0),
+          child: Center(
+            child: Card(
+              color: Colors.blue.shade50.withOpacity(0.8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 18,
                 ),
-              ),
-              const SizedBox(height: 50),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                child: PinCodeTextField(
-                  appContext: context,
-                  length: 4,
-                  controller: _otpController,
-                  onChanged: (value) {
-                    setState(() {
-                      _otp = value;
-                    });
-                  },
-                  onCompleted: (value) {
-                    setState(() {
-                      _otp = value;
-                    });
-                  },
-                  pinTheme: PinTheme(
-                    shape: PinCodeFieldShape.box,
-                    borderRadius: BorderRadius.circular(5),
-                    fieldHeight: 66,
-                    fieldWidth: 52,
-                    activeFillColor: Colors.grey[200],
-                    inactiveFillColor: Colors.grey[200],
-                    selectedFillColor: Colors.grey[200],
-                    activeColor: Colors.black,
-                    inactiveColor: Colors.black,
-                    selectedColor: Colors.black,
-                  ),
-                  cursorColor: Colors.black,
-                  animationType: AnimationType.fade,
-                  enableActiveFill: true,
-                  keyboardType: TextInputType.number,
-                  textStyle: const TextStyle(fontSize: 20, color: Colors.black),
-                ),
-              ),
-              const SizedBox(height: 50),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  elevation: 4,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 15,
-                    horizontal: 50,
-                  ),
-                  child: Text(
-                    'SUBMIT',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black,
-                      letterSpacing: 1,
-                      fontSize: 18,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        'Please enter OTP sent on your mobile number.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          color: Colors.black,
+                          letterSpacing: 1,
+                          fontSize: 16,
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 50),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                      child: PinCodeTextField(
+                        appContext: context,
+                        length: 4,
+                        controller: _otpController,
+                        onChanged: (value) {
+                          setState(() {
+                            _otp = value;
+                          });
+                        },
+                        onCompleted: (value) {
+                          setState(() {
+                            _otp = value;
+                          });
+                        },
+                        pinTheme: PinTheme(
+                          shape: PinCodeFieldShape.box,
+                          borderRadius: BorderRadius.circular(5),
+                          fieldHeight: 66,
+                          fieldWidth: 52,
+                          activeFillColor: Colors.grey[200],
+                          inactiveFillColor: Colors.grey[200],
+                          selectedFillColor: Colors.grey[200],
+                          activeColor: Colors.black,
+                          inactiveColor: Colors.black,
+                          selectedColor: Colors.black,
+                        ),
+                        cursorColor: Colors.black,
+                        animationType: AnimationType.fade,
+                        enableActiveFill: true,
+                        keyboardType: TextInputType.number,
+                        textStyle: const TextStyle(
+                          fontSize: 20,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 50),
+                    ElevatedButton(
+                      onPressed: () {
+                        _verifyOtp();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.black,
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 4,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 50,
+                        ),
+                        child: Text(
+                          'SUBMIT',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black,
+                            letterSpacing: 1,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),

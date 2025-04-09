@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mr_blue/src/core/utils.dart';
+import 'package:mr_blue/src/presentation/drawer/drawer.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -6,18 +8,8 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Home Screen',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Colors.blue.shade700,
-        centerTitle: true,
-      ),
+      appBar: customAppBar(),
+      drawer: CustomDrawer(),
       body: Container(
         width: double.infinity,
         height: double.infinity,
