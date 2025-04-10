@@ -102,7 +102,7 @@ class _MyProfileState extends State<MyProfile> {
                       height: 64.h,
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),

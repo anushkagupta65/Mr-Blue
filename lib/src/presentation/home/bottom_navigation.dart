@@ -52,7 +52,7 @@ class _BottomnavigationState extends State<Bottomnavigation> {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
-            label: 'Profile',
+            label: 'Settings',
           ),
           BottomNavigationBarItem(icon: Icon(Icons.call), label: 'Call'),
           BottomNavigationBarItem(

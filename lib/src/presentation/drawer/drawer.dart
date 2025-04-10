@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -34,6 +35,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      width: 0.70.sw,
       elevation: 16.0,
       shadowColor: Colors.black.withOpacity(0.3),
       backgroundColor: Colors.white,
@@ -41,80 +43,77 @@ class _CustomDrawerState extends State<CustomDrawer> {
         child: Column(
           children: [
             Container(
+              height: 120.h,
               color: Colors.blue[800],
               child: Padding(
-                padding: const EdgeInsets.only(left: 10.0, top: 30),
+                padding: EdgeInsets.only(left: 10.w, top: 30.h),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.transparent,
-                      child: ClipOval(
-                        // child: profileImg != null && profileImg!.isNotEmpty
-                        //     ? Image.network(
-                        //         profileImg!,
-                        //         fit: BoxFit.cover,
-                        //         width: 70,
-                        //         height: 70,
-                        //       )
-                        //     : Image.asset(
-                        //         'assets/images/Fabspin.png',
-                        //         fit: BoxFit.cover,
-                        //         width: 70,
-                        //         height: 70,
-                        //       ),
+                      backgroundColor: Colors.white,
+                      radius: 32.r,
+                      child: Image.asset(
+                        'assets/images/mr-blue-logo.png',
+                        fit: BoxFit.cover,
+                        height: 30.h,
                       ),
                     ),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _name,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
-                              letterSpacing: 1,
-                              fontSize: 15,
-                            ),
-                          ),
-                          SizedBox(height: 5),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 5),
-                            child: Text(
-                              _email,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white.withOpacity(0.6),
-                                letterSpacing: 1,
-                                fontSize: 12,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                          ),
-                          SizedBox(height: 5),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 5),
-                            child: Text(
-                              _mobile,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8.w,
+                          vertical: 8.h,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              _name,
                               style: TextStyle(
                                 fontWeight: FontWeight.w500,
                                 color: Colors.white,
                                 letterSpacing: 1,
-                                fontSize: 12,
+                                fontSize: 15.sp, // Responsive font size
                               ),
-                              textAlign: TextAlign.left,
                             ),
-                          ),
-                        ],
+                            SizedBox(height: 4.h),
+                            Padding(
+                              padding: EdgeInsets.only(right: 5.w),
+                              child: Text(
+                                _email,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white.withOpacity(0.6),
+                                  letterSpacing: 1,
+                                  fontSize: 8.sp,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                            ),
+                            SizedBox(height: 4.h),
+                            Padding(
+                              padding: EdgeInsets.only(right: 5.w),
+                              child: Text(
+                                _mobile,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
+                                  letterSpacing: 1,
+                                  fontSize: 12.sp,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            customDivider(),
             _buildMenuItem(
               icon: Icons.home,
               title: 'Home',
@@ -128,40 +127,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 //   context,
                 //   MaterialPageRoute(
                 //     builder: (context) => const Bottomnavigation(),
-                //   ),
-                // );
-              },
-            ),
-            customDivider(),
-            _buildMenuItem(
-              icon: Icons.announcement_outlined,
-              title: 'Promotions & Offers',
-              index: 1,
-              isActive: _activeDrawerIndex == 1,
-              onTap: () {
-                setState(() {
-                  _activeDrawerIndex = 1;
-                });
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => const Promotions()),
-                // );
-              },
-            ),
-            customDivider(),
-            _buildMenuItem(
-              icon: Icons.delivery_dining_outlined,
-              title: 'Request Pickup',
-              index: 2,
-              isActive: _activeDrawerIndex == 2,
-              onTap: () {
-                setState(() {
-                  _activeDrawerIndex = 2;
-                });
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => const RequestPickup(),
                 //   ),
                 // );
               },
@@ -201,7 +166,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             customDivider(),
             _buildMenuItem(
               icon: Icons.currency_rupee_outlined,
-              title: 'Pay  Now',
+              title: 'Pay Now',
               index: 5,
               isActive: _activeDrawerIndex == 5,
               onTap: () {
@@ -217,7 +182,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             customDivider(),
             _buildMenuItem(
               icon: Icons.price_change_outlined,
-              title: 'Price  List',
+              title: 'Price List',
               index: 6,
               isActive: _activeDrawerIndex == 6,
               onTap: () {
@@ -248,22 +213,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
             customDivider(),
             _buildMenuItem(
-              icon: Icons.settings,
-              title: 'Settings',
-              index: 8,
-              isActive: _activeDrawerIndex == 8,
-              onTap: () {
-                setState(() {
-                  _activeDrawerIndex = 8;
-                });
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => const Setting()),
-                // );
-              },
-            ),
-            customDivider(),
-            _buildMenuItem(
               icon: Icons.logout,
               title: 'Logout ',
               index: 9,
@@ -280,45 +229,49 @@ class _CustomDrawerState extends State<CustomDrawer> {
       ),
     );
   }
-}
 
-Widget _buildMenuItem({
-  required IconData icon,
-  required String title,
-  required int index,
-  required bool isActive,
-  required VoidCallback onTap,
-}) {
-  return Padding(
-    padding: const EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 10),
-    child: InkWell(
-      onTap: onTap,
-      child: Container(
-        height: 40,
-        decoration: BoxDecoration(
-          color: isActive ? Colors.blue[800] : Colors.white,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.only(left: 18.0, top: 5, bottom: 5),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Icon(icon, color: isActive ? Colors.white : Colors.blue[900]),
-              const SizedBox(width: 20),
-              Text(
-                title,
-                style: TextStyle(
-                  fontWeight: FontWeight.w500,
+  Widget _buildMenuItem({
+    required IconData icon,
+    required String title,
+    required int index,
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          height: 40.h,
+          decoration: BoxDecoration(
+            color: isActive ? Colors.blue[800] : Colors.white,
+            borderRadius: BorderRadius.circular(10.r),
+          ),
+          child: Padding(
+            padding: EdgeInsets.only(left: 18.w, top: 5.h, bottom: 5.h),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Icon(
+                  icon,
                   color: isActive ? Colors.white : Colors.blue[900],
-                  letterSpacing: 1,
-                  fontSize: 16,
+                  size: 20.sp,
                 ),
-              ),
-            ],
+                SizedBox(width: 20.w),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: isActive ? Colors.white : Colors.blue[900],
+                    letterSpacing: 1,
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }

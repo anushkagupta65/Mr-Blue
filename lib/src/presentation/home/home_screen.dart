@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/drawer/drawer.dart';
 import 'dart:convert';
-
 import 'package:mr_blue/src/services/api_services.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -52,6 +52,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Initialize ScreenUtil
+    ScreenUtil.init(
+      context,
+      designSize: const Size(375, 812), // Typical iPhone 11 Pro size
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
+
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
       child: Scaffold(
@@ -79,28 +87,28 @@ class _HomeScreenState extends State<HomeScreen> {
                       Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12.w,
+                              vertical: 6.h,
                             ),
                             child: Column(
                               children: [
-                                const SizedBox(height: 6),
                                 Text(
                                   "Find Your Nearest Laundromat",
                                   style: TextStyle(
                                     color: Colors.blue.shade800,
-                                    fontSize: 28,
+                                    fontSize: 24.sp,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(height: 10.h),
                                 TextField(
                                   decoration: InputDecoration(
+                                    hintStyle: TextStyle(fontSize: 10.sp),
                                     hintText: 'Search for a laundry service',
                                     prefixIcon: Icon(Icons.search),
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderRadius: BorderRadius.circular(8.r),
                                     ),
                                     filled: true,
                                     fillColor: Colors.blue.shade50,
@@ -109,83 +117,87 @@ class _HomeScreenState extends State<HomeScreen> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 32),
+                          SizedBox(height: 32.h),
                           Text(
                             'OUR SERVICES',
                             style: TextStyle(
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w600,
                               color: Colors.black,
-                              letterSpacing: 2,
-                              fontSize: 22,
+                              fontSize: 20.sp,
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 6,
-                              horizontal: 12,
+                            padding: EdgeInsets.symmetric(
+                              vertical: 6.h,
+                              horizontal: 12.w,
                             ),
                             child: SizedBox(
-                              height: 160,
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                physics: const BouncingScrollPhysics(),
-                                itemCount: _services.length,
-                                itemBuilder: (context, index) {
-                                  final service = _services[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.only(
-                                      right: 10.0,
-                                      left: 6,
-                                      top: 4,
-                                      bottom: 4,
-                                    ),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.5),
-                                            spreadRadius: 2,
-                                            blurRadius: 4,
-                                          ),
-                                        ],
-                                        borderRadius: BorderRadius.circular(
-                                          4.0,
-                                        ),
+                              height: 160.h,
+                              child: Center(
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  scrollDirection: Axis.horizontal,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: _services.length,
+                                  itemBuilder: (context, index) {
+                                    final service = _services[index];
+                                    return Padding(
+                                      padding: EdgeInsets.only(
+                                        right: 10.w,
+                                        left: 6.w,
+                                        top: 4.h,
+                                        bottom: 4.h,
                                       ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 8,
-                                        ),
-                                        child: InkWell(
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Image.network(
-                                                service['imageUrl'],
-                                                fit: BoxFit.fitHeight,
-                                                width: 72,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey.withOpacity(
+                                                0.5,
                                               ),
-                                              const SizedBox(height: 12.0),
-                                              Text(
-                                                service['name'],
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Colors.black,
-                                                  letterSpacing: 1,
-                                                  fontSize: 16,
+                                              spreadRadius: 2.r,
+                                              blurRadius: 4.r,
+                                            ),
+                                          ],
+                                          borderRadius: BorderRadius.circular(
+                                            4.r,
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 10.w,
+                                            vertical: 6.h,
+                                          ),
+                                          child: InkWell(
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Image.network(
+                                                  service['imageUrl'],
+                                                  fit: BoxFit.fitHeight,
+                                                  width: 68.w,
                                                 ),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            ],
+                                                SizedBox(height: 12.h),
+                                                Text(
+                                                  service['name'],
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Colors.black,
+                                                    letterSpacing: 1.w,
+                                                    fontSize: 12.sp,
+                                                  ),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  );
-                                },
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                           ),
@@ -196,7 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Column(
                             children: [
-                              SizedBox(height: 32),
+                              SizedBox(height: 32.h),
                               SizedBox(
                                 width: double.infinity,
                                 child: ShaderMask(
@@ -222,16 +234,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0,
-                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
                             child: RichText(
                               text: TextSpan(
                                 children: [
                                   TextSpan(
                                     text: 'Picks up, Cleans ',
                                     style: TextStyle(
-                                      fontSize: 28,
+                                      fontSize: 28.sp,
                                       fontWeight: FontWeight.w700,
                                       color: Colors.blue.shade800,
                                     ),
@@ -239,7 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   TextSpan(
                                     text: 'and ',
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 16.sp,
                                       fontWeight: FontWeight.w700,
                                       color: Colors.black,
                                     ),
@@ -247,7 +257,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   TextSpan(
                                     text: 'Delivers ',
                                     style: TextStyle(
-                                      fontSize: 28,
+                                      fontSize: 28.sp,
                                       fontWeight: FontWeight.w700,
                                       color: Colors.blue.shade800,
                                     ),
@@ -256,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     text:
                                         'your laundry right to your doorstep!',
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 16.sp,
                                       fontWeight: FontWeight.w700,
                                       color: Colors.black,
                                     ),
