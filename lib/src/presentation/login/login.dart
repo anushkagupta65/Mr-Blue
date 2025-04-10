@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/login/verify_otp.dart';
+import 'package:mr_blue/src/services/api_services.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,71 +16,67 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController mobileNumber = TextEditingController();
   bool isChecked = false;
+  bool isLoading = false;
+  final ApiService apiService = ApiService();
 
-  // Future<void> registerUser() async {
-  //   final url = Uri.parse(Urls.registerUser);
-  //   final response = await http.post(
-  //     url,
-  //     body: json.encode({
-  //       "mobile": mobileNumber.text,
-  //     }),
-  //     headers: {'Content-Type': 'application/json'},
-  //   );
+  bool isValidMobileNumber(String mobile) {
+    final RegExp mobileRegExp = RegExp(r'^\d{10}$');
+    return mobileRegExp.hasMatch(mobile);
+  }
 
-  //   if (response.statusCode == 200) {
-  //     final responseData = json.decode(response.body);
-  //     if (responseData['Status'] == 'Success') {
-  //       print("responseData inside login screen $responseData");
-
-  //       await _saveUserId(responseData['user']['id']);
-  //       mobileNumber.clear();
-
-  //       Navigator.push(
-  //         context,
-  //         MaterialPageRoute(
-  //           builder: (context) => VerifyOtpScreen(
-  //             responseData['user']['m_otp'].toString(),
-  //           ),
-  //         ),
-  //       );
-  //     } else {
-  //       _showSnackBar('Registration failed. Please try again.');
-  //     }
-  //   } else {
-  //     _showSnackBar('An error occurred. Please try again later.');
-  //   }
-  // }
-
-  // Future<void> _saveUserId(int userId) async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   await prefs.setInt('user_id', userId);
-  // }
-
-  // void _showSnackBar(String message) {
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(content: Text(message)),
-  //   );
-  // }
-
-  void _validateForm() {
+  Future<void> submitMobileNumber() async {
     if (!isChecked) {
       showToastMessage('You must accept the conditions to proceed.');
-    } else if (mobileNumber.text.isEmpty) {
+      return;
+    }
+
+    String mobile = mobileNumber.text.trim();
+    if (mobile.isEmpty) {
       showToastMessage('Please enter your phone number.');
-    } else {
-      // registerUser();
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => VerifyOtpScreen("1234")),
-      );
+      return;
+    }
+
+    if (!isValidMobileNumber(mobile)) {
+      showToastMessage('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      String response = await apiService.registerNewUser(mobile);
+      print("This is response = $response");
+      if (response.isEmpty) {
+        showToastMessage('Failed to send OTP. Please try again.');
+        return;
+      }
+
+      Map<String, dynamic> responseData = jsonDecode(response);
+      String userId = responseData['user']['id'].toString();
+
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => VerifyOtpScreen(userId)),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        showToastMessage(e.toString().replaceFirst('Exception: ', ''));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Container(
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      child: Scaffold(
+        body: Container(
           width: double.infinity,
           height: double.infinity,
           decoration: BoxDecoration(
@@ -91,19 +90,19 @@ class _LoginScreenState extends State<LoginScreen> {
                 Colors.black.withOpacity(0.5),
                 BlendMode.dstATop,
               ),
-              image: AssetImage("assets/images/login_screen.png"),
+              image: const AssetImage("assets/images/login_screen.png"),
               fit: BoxFit.cover,
             ),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28.0),
+            padding: EdgeInsets.symmetric(horizontal: 28.w),
             child: Center(
               child: Card(
                 color: Colors.blue.shade50.withOpacity(0.8),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 18,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 18.h,
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -117,31 +116,32 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontWeight: FontWeight.w900,
                           color: Colors.indigo.shade900,
                           letterSpacing: 2,
-                          fontSize: 44,
+                          fontSize: 36.sp,
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24.h),
                       Image.asset(
                         'assets/images/mr-blue-logo.png',
                         fit: BoxFit.cover,
-                        height: 80,
+                        height: 80.h,
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24.h),
                       Text(
-                        ' Have your clothes cleaned effortlessly. with just a tap of your finger. ​',
+                        'Have your clothes cleaned effortlessly with just a tap of your finger.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontWeight: FontWeight.w900,
-                          color: Colors.indigo.shade900,
-                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.indigo.shade700,
+                          fontSize: 16.sp,
                         ),
                       ),
-                      const SizedBox(height: 36),
+                      SizedBox(height: 36.h),
                       TextField(
                         controller: mobileNumber,
-                        keyboardType: TextInputType.phone,
+                        keyboardType: TextInputType.number,
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(10),
                         ],
                         decoration: InputDecoration(
                           hintText: 'Enter Phone Number',
@@ -149,21 +149,21 @@ class _LoginScreenState extends State<LoginScreen> {
                             fontWeight: FontWeight.w600,
                             color: Colors.black,
                             letterSpacing: 1,
-                            fontSize: 16,
+                            fontSize: 16.sp,
                           ),
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
+                            borderRadius: BorderRadius.circular(8.r),
                             borderSide: BorderSide.none,
                           ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 15.0,
-                            horizontal: 20.0,
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: 15.h,
+                            horizontal: 20.w,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      SizedBox(height: 6.h),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -178,13 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              // Navigate to the terms and conditions page
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) => TermsAndConditionsPage(),
-                              //   ),
-                              // );
+                              // Navigate to terms and conditions page
                             },
                             child: Text(
                               "Accept Terms & Conditions.",
@@ -192,34 +186,44 @@ class _LoginScreenState extends State<LoginScreen> {
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black,
                                 letterSpacing: 1,
-                                fontSize: 12,
+                                fontSize: 12.sp,
                               ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24.h),
                       ElevatedButton(
-                        onPressed: _validateForm,
+                        onPressed: isLoading ? null : submitMobileNumber,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 50.0,
-                            vertical: 10.0,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 50.w,
+                            vertical: 10.h,
                           ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
+                            borderRadius: BorderRadius.circular(8.r),
                           ),
                         ),
-                        child: Text(
-                          'GET OTP',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black,
-                            letterSpacing: 1,
-                            fontSize: 16,
-                          ),
-                        ),
+                        child:
+                            isLoading
+                                ? SizedBox(
+                                  height: 20.h,
+                                  width: 20.w,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.w,
+                                    color: Colors.black,
+                                  ),
+                                )
+                                : Text(
+                                  'GET OTP',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.black,
+                                    letterSpacing: 1,
+                                    fontSize: 16.sp,
+                                  ),
+                                ),
                       ),
                     ],
                   ),
@@ -230,5 +234,11 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    mobileNumber.dispose();
+    super.dispose();
   }
 }

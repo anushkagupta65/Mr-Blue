@@ -12,14 +12,12 @@ Widget customDivider() {
 dynamic customAppBar() {
   return AppBar(
     backgroundColor: Colors.blue.shade700,
-    title: Center(
-      child: Text(
-        'mr. blue',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-        ),
+    title: Text(
+      'mr. blue',
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
       ),
     ),
     centerTitle: true,
