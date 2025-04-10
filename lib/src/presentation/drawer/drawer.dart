@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mr_blue/src/core/utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -11,6 +12,25 @@ class CustomDrawer extends StatefulWidget {
 int _activeDrawerIndex = 0;
 
 class _CustomDrawerState extends State<CustomDrawer> {
+  String _name = '';
+  String _email = '';
+  String _mobile = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _name = prefs.getString('user_name') ?? 'User';
+      _email = prefs.getString('user_email') ?? 'No email';
+      _mobile = prefs.getString('user_mobile') ?? 'No mobile';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -51,7 +71,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Anushka",
+                            _name,
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
                               color: Colors.white,
@@ -63,7 +83,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                           Padding(
                             padding: const EdgeInsets.only(right: 5),
                             child: Text(
-                              "Noida, India",
+                              _email,
                               style: TextStyle(
                                 fontWeight: FontWeight.w500,
                                 color: Colors.white.withOpacity(0.6),
@@ -77,7 +97,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                           Padding(
                             padding: const EdgeInsets.only(right: 5),
                             child: Text(
-                              "Wallet: Rs. ",
+                              _mobile,
                               style: TextStyle(
                                 fontWeight: FontWeight.w500,
                                 color: Colors.white,

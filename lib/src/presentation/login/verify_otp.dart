@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
@@ -28,16 +29,27 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', true);
-      debugPrint('Login status saved: true');
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Bottomnavigation()),
+      Map<String, dynamic> userData = jsonDecode(response);
+      await prefs.setString('user_name', userData['name'] ?? 'User');
+      await prefs.setString(
+        'user_email',
+        userData['email'] ?? 'abc@example.com',
       );
-      debugPrint('Navigated to Bottomnavigation');
+      await prefs.setString('user_mobile', userData['mobile'] ?? '');
+      debugPrint('Login status and user data saved');
+
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Bottomnavigation()),
+        );
+        debugPrint('Navigated to Bottomnavigation');
+      }
     } catch (e) {
       debugPrint('Error verifying OTP: $e');
-      showToastMessage("Please enter a valid OTP");
+      if (mounted) {
+        showToastMessage("Please enter a valid OTP");
+      }
     }
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/drawer/drawer.dart';
+import 'package:mr_blue/src/presentation/profile/profile.dart';
 
 class Setting extends StatefulWidget {
   const Setting({super.key});
@@ -33,10 +34,10 @@ class _SettingState extends State<Setting> {
           children: [
             InkWell(
               onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => const MyProfile()),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MyProfile()),
+                );
               },
               child: ListTile(
                 title: Text("My Profile", style: textStyle),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mr_blue/src/core/constants.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/drawer/drawer.dart';
-// import 'package:video_player/video_player.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,27 +11,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // late VideoPlayerController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    // _controller = VideoPlayerController.asset('assets/images/intro_video.mp4')
-    //   ..initialize().then((_) {
-    //     setState(() {});
-    //     _controller
-    //       ..setLooping(true) // Set to true if you want the video to loop
-    //       ..setVolume(0.0) // Muted by default
-    //       ..play();
-    //   });
-  }
-
-  // @override
-  // void dispose() {
-  //   _controller.dispose();
-  //   super.dispose();
-  // }
-
   @override
   Widget build(BuildContext context) {
     return MediaQuery(
