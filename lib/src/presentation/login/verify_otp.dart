@@ -31,6 +31,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
       await prefs.setBool('isLoggedIn', true);
       Map<String, dynamic> userData = jsonDecode(response);
       await prefs.setString('user_name', userData['name'] ?? 'User');
+      await prefs.setString('user_id', userData['user_id'].toString());
       await prefs.setString(
         'user_email',
         userData['email'] ?? 'abc@example.com',
@@ -105,7 +106,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                       ),
                       SizedBox(height: 50.h),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 40.w),
+                        padding: EdgeInsets.symmetric(horizontal: 16.w),
                         child: PinCodeTextField(
                           appContext: context,
                           length: 4,
@@ -162,7 +163,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                             fontWeight: FontWeight.w700,
                             color: Colors.black,
                             letterSpacing: 1,
-                            fontSize: 18.sp,
+                            fontSize: 14.sp,
                           ),
                         ),
                       ),

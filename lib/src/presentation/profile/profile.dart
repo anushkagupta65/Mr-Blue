@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
+import 'package:mr_blue/src/services/api_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyProfile extends StatefulWidget {
@@ -13,8 +16,9 @@ class MyProfile extends StatefulWidget {
 class _MyProfileState extends State<MyProfile> {
   final TextEditingController _email = TextEditingController();
   final TextEditingController _name = TextEditingController();
-  int? userId;
+  String _userId = '';
   String _mobile = '';
+  final ApiService _apiService = ApiService();
 
   @override
   void initState() {
@@ -28,7 +32,44 @@ class _MyProfileState extends State<MyProfile> {
       _name.text = prefs.getString('user_name') ?? 'User';
       _email.text = prefs.getString('user_email') ?? 'No email';
       _mobile = prefs.getString('user_mobile') ?? 'No mobile';
+      _userId = prefs.getString('user_id') ?? ''; // Load userId
     });
+  }
+
+  Future<void> _updateProfile() async {
+    if (_userId.isEmpty) {
+      showToastMessage("User ID not found. Please log in again.");
+      return;
+    }
+
+    try {
+      String response = await _apiService.updateProfile(
+        _userId,
+        _name.text,
+        _email.text,
+      );
+      print(response);
+      Map<String, dynamic> userData = jsonDecode(response);
+      if (userData['Status'] == 'Success') {
+        Navigator.of(context).pop();
+        showToastMessage("Profile updated successfully");
+      } else {
+        showToastMessage("Failed to update profile: ${userData['message']}");
+      }
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('user_name', _name.text);
+      await prefs.setString('user_email', _email.text);
+      showToastMessage("Profile updated successfully");
+    } catch (e) {
+      showToastMessage("Failed: $e");
+    }
+  }
+
+  @override
+  void dispose() {
+    _email.dispose();
+    _name.dispose();
+    super.dispose();
   }
 
   @override
@@ -165,7 +206,7 @@ class _MyProfileState extends State<MyProfile> {
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                onPressed: () {},
+                onPressed: _updateProfile,
                 child: Text(
                   'Update Profile',
                   style: TextStyle(

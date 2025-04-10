@@ -101,8 +101,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 color: Colors.blue.shade50.withOpacity(0.8),
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 18.h,
+                    horizontal: 12.w,
+                    vertical: 12.h,
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -116,23 +116,23 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontWeight: FontWeight.w900,
                           color: Colors.indigo.shade900,
                           letterSpacing: 2,
-                          fontSize: 36.sp,
+                          fontSize: 28.sp,
                         ),
                       ),
-                      SizedBox(height: 24.h),
+                      SizedBox(height: 18.h),
                       Image.asset(
                         'assets/images/mr-blue-logo.png',
                         fit: BoxFit.cover,
-                        height: 80.h,
+                        height: 64.h,
                       ),
-                      SizedBox(height: 24.h),
+                      SizedBox(height: 18.h),
                       Text(
                         'Have your clothes cleaned effortlessly with just a tap of your finger.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.indigo.shade700,
-                          fontSize: 16.sp,
+                          fontSize: 12.sp,
                         ),
                       ),
                       SizedBox(height: 36.h),
@@ -146,10 +146,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         decoration: InputDecoration(
                           hintText: 'Enter Phone Number',
                           hintStyle: TextStyle(
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w500,
                             color: Colors.black,
                             letterSpacing: 1,
-                            fontSize: 16.sp,
+                            fontSize: 10.sp,
                           ),
                           filled: true,
                           fillColor: Colors.white,
@@ -163,7 +163,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 6.h),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -186,7 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black,
                                 letterSpacing: 1,
-                                fontSize: 12.sp,
+                                fontSize: 10.sp,
                               ),
                             ),
                           ),
@@ -221,10 +220,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                     fontWeight: FontWeight.w700,
                                     color: Colors.black,
                                     letterSpacing: 1,
-                                    fontSize: 16.sp,
+                                    fontSize: 14.sp,
                                   ),
                                 ),
                       ),
+                      SizedBox(height: 12.h),
                     ],
                   ),
                 ),
