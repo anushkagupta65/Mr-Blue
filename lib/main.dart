@@ -17,7 +17,8 @@ class MyApp extends StatelessWidget {
       builder: (context, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'Mr. Blue',
+          title: 'mr. blue',
+
           theme: ThemeData(
             fontFamily: 'Poppins',
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue.shade700),

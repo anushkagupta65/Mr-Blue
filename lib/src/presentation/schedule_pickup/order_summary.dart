@@ -1,0 +1,271 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mr_blue/src/core/utils.dart';
+import 'package:mr_blue/src/presentation/schedule_pickup/booking_confirmation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
+
+class OrderSummaryScreen extends StatefulWidget {
+  final DateTime pickupDateTime;
+
+  const OrderSummaryScreen({super.key, required this.pickupDateTime});
+
+  @override
+  State<OrderSummaryScreen> createState() => _OrderSummaryScreenState();
+}
+
+class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
+  final TextEditingController contactNumberController = TextEditingController();
+  String selectedAddress = 'office - Test, 12001';
+  late DateTime pickupDateTime;
+  DateTime? deliveryDateTime;
+  final TextEditingController commentsController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    pickupDateTime = widget.pickupDateTime;
+    loadContactNumber();
+    fetchDeliveryDateTime();
+  }
+
+  Future<void> loadContactNumber() async {
+    final prefs = await SharedPreferences.getInstance();
+    final number = prefs.getString('user_mobile') ?? '';
+    setState(() {
+      contactNumberController.text = number;
+    });
+  }
+
+  Future<void> fetchDeliveryDateTime() async {
+    await Future.delayed(Duration(seconds: 1));
+    setState(() {
+      deliveryDateTime = pickupDateTime.add(Duration(days: 4));
+    });
+  }
+
+  String formatDateTime(DateTime dateTime) {
+    final dateFormat = DateFormat('EEEE dd MMMM, h a');
+    final startHour = dateFormat.format(dateTime);
+    final endHour = DateFormat('h a').format(dateTime.add(Duration(hours: 2)));
+    return '$startHour - $endHour';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.blue.shade50,
+      appBar: customAppBar("Order Summary"),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Contact Number',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 16.sp,
+                color: Colors.black87,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            TextField(
+              controller: contactNumberController,
+              keyboardType: TextInputType.phone,
+              decoration: InputDecoration(
+                hintText: 'Enter contact number',
+                hintStyle: TextStyle(color: Colors.grey[500]),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey.shade400),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blue.shade600),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16.w,
+                  vertical: 14.h,
+                ),
+              ),
+            ),
+            SizedBox(height: 20.h),
+            Text(
+              'Select Address',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 16.sp,
+                color: Colors.black87,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            DropdownButtonFormField<String>(
+              value: selectedAddress,
+              items:
+                  <String>[
+                    'office - Test, 12001',
+                  ].map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value, style: TextStyle(fontSize: 14.sp)),
+                    );
+                  }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedAddress = newValue!;
+                });
+              },
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey.shade400),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blue.shade600),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16.w,
+                  vertical: 14.h,
+                ),
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              'Pickup Date & Time',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 16.sp,
+                color: Colors.black87,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Card(
+              elevation: 1.5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: ListTile(
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16.w,
+                  vertical: 10.h,
+                ),
+                title: Text(
+                  formatDateTime(pickupDateTime),
+                  style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                ),
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              'Delivery Date & Time',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 16.sp,
+                color: Colors.black87,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Card(
+              elevation: 1.5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: ListTile(
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16.w,
+                  vertical: 10.h,
+                ),
+                title: Text(
+                  deliveryDateTime != null
+                      ? formatDateTime(deliveryDateTime!)
+                      : 'Loading...',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color:
+                        deliveryDateTime != null ? Colors.black87 : Colors.grey,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              'Comments/Delivery Instructions',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 16.sp,
+                color: Colors.black87,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            TextField(
+              controller: commentsController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: 'Enter comments here...',
+                hintStyle: TextStyle(color: Colors.grey[500]),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey.shade400),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blue.shade600),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16.w,
+                  vertical: 14.h,
+                ),
+              ),
+            ),
+            SizedBox(height: 20.h),
+            ElevatedButton(
+              onPressed: () {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text('Order Confirmed!')));
+                Future.delayed(const Duration(seconds: 2), () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const BookingConfirmation(),
+                    ),
+                  );
+                });
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue.shade700,
+                foregroundColor: Colors.white,
+                minimumSize: Size(double.infinity, 50.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                elevation: 3,
+              ),
+              child: Text(
+                'CONFIRM ORDER',
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

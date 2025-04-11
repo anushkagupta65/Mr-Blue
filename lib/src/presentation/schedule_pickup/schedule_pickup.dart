@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:mr_blue/src/core/utils.dart';
-import 'package:mr_blue/src/presentation/schedule_pickup/helper_methods.dart';
+import 'package:mr_blue/src/presentation/schedule_pickup/order_summary.dart';
 import 'package:mr_blue/src/services/api_services.dart';
 
 class BookingScreen extends StatefulWidget {
@@ -269,13 +269,16 @@ class _BookingScreenState extends State<BookingScreen> {
             Padding(
               padding: EdgeInsets.all(12.r),
               child: ElevatedButton(
-                onPressed:
-                    () => BookingHelper.onScheduleTap(
-                      context,
-                      timeid,
-                      addresses,
-                      userId,
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder:
+                          (context) => OrderSummaryScreen(
+                            pickupDateTime: DateTime.now(),
+                          ),
                     ),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue.shade700,
                   foregroundColor: Colors.white,
@@ -300,7 +303,7 @@ class _BookingScreenState extends State<BookingScreen> {
     );
   }
 
-  onDateTap(
+  void onDateTap(
     BuildContext context,
     DateTime date,
     Function setState,

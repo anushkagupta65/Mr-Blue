@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/drawer/drawer.dart';
 import 'package:mr_blue/src/presentation/setting/about_us.dart';
+import 'package:mr_blue/src/presentation/setting/addresses.dart';
 import 'package:mr_blue/src/presentation/setting/profile.dart';
 
 class Setting extends StatefulWidget {
@@ -50,10 +51,12 @@ class _SettingState extends State<Setting> {
             const SizedBox(height: 10),
             InkWell(
               onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => const AddAddress()),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddAddressStatic(),
+                  ),
+                );
               },
               child: ListTile(
                 title: Text("Add Address", style: textStyle),

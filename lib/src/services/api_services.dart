@@ -139,6 +139,28 @@ class ApiService {
     }
   }
 
+  // ================================================================= TO GET CITIES ===================================================
+  /// Fetches the list of cities available for a user.
+  Future<String> fetchCities() async {
+    try {
+      var request = http.Request('GET', Uri.parse('$_baseUrl/new-user-city'));
+      request.headers.addAll(_getHeaders());
+
+      http.StreamedResponse response = await request.send();
+
+      String responseBody = await response.stream.bytesToString();
+      if (response.statusCode == 200) {
+        return responseBody;
+      } else {
+        throw Exception(
+          'Failed: ${response.statusCode} - ${response.reasonPhrase}',
+        );
+      }
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
   // ================================================================ TO HANDLE EXCEPTION ===================================================
   /// Handles errors that occur during API requests.
   Exception _handleError(dynamic error) {
