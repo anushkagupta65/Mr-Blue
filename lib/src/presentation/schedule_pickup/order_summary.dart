@@ -74,6 +74,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
             ),
             SizedBox(height: 8.h),
             TextField(
+              maxLength: 10,
               controller: contactNumberController,
               keyboardType: TextInputType.phone,
               decoration: InputDecoration(
@@ -96,7 +97,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height: 12.h),
             Text(
               'Select Address',
               style: TextStyle(
@@ -140,7 +141,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 12.h),
             Text(
               'Pickup Date & Time',
               style: TextStyle(
@@ -150,23 +151,25 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               ),
             ),
             SizedBox(height: 8.h),
-            Card(
-              elevation: 1.5,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: ListTile(
+            TextField(
+              readOnly: true,
+              decoration: InputDecoration(
+                hintText: formatDateTime(pickupDateTime),
+                hintStyle: TextStyle(color: Colors.black),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey.shade400),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: 16.w,
-                  vertical: 10.h,
-                ),
-                title: Text(
-                  formatDateTime(pickupDateTime),
-                  style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                  vertical: 14.h,
                 ),
               ),
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 12.h),
             Text(
               'Delivery Date & Time',
               style: TextStyle(
@@ -176,29 +179,28 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               ),
             ),
             SizedBox(height: 8.h),
-            Card(
-              elevation: 1.5,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: ListTile(
+            TextField(
+              readOnly: true,
+              decoration: InputDecoration(
+                hintText:
+                    deliveryDateTime != null
+                        ? formatDateTime(deliveryDateTime!)
+                        : 'Loading...',
+                hintStyle: TextStyle(color: Colors.black),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey.shade400),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: 16.w,
-                  vertical: 10.h,
-                ),
-                title: Text(
-                  deliveryDateTime != null
-                      ? formatDateTime(deliveryDateTime!)
-                      : 'Loading...',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    color:
-                        deliveryDateTime != null ? Colors.black87 : Colors.grey,
-                  ),
+                  vertical: 14.h,
                 ),
               ),
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 12.h),
             Text(
               'Comments/Delivery Instructions',
               style: TextStyle(
@@ -231,7 +233,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height: 16.h),
             ElevatedButton(
               onPressed: () {
                 ScaffoldMessenger.of(
@@ -240,7 +242,12 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                 Future.delayed(const Duration(seconds: 2), () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => const BookingConfirmation(),
+                      builder:
+                          (context) => const Confirmation(
+                            title: 'Order Confirmed',
+                            desription:
+                                "Your order has been successfully placed.",
+                          ),
                     ),
                   );
                 });

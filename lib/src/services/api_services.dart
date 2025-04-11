@@ -1,4 +1,5 @@
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   static const String _baseUrl = 'https://crm.mr-blue.in/api';
@@ -144,6 +145,45 @@ class ApiService {
   Future<String> fetchCities() async {
     try {
       var request = http.Request('GET', Uri.parse('$_baseUrl/new-user-city'));
+      request.headers.addAll(_getHeaders());
+
+      http.StreamedResponse response = await request.send();
+
+      String responseBody = await response.stream.bytesToString();
+      if (response.statusCode == 200) {
+        return responseBody;
+      } else {
+        throw Exception(
+          'Failed: ${response.statusCode} - ${response.reasonPhrase}',
+        );
+      }
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  // ================================================================ TO ADD ADDRESS ===================================================
+  /// Adds a new address for a user.
+  Future<String> addAddress(String cityId, String address, String zip) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String userId = prefs.getString('user_id') ?? '';
+
+      if (userId.isEmpty) {
+        throw Exception('User ID not found in SharedPreferences');
+      }
+
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$_baseUrl/new-user-update-address'),
+      );
+
+      request.fields.addAll({
+        'user_id': userId,
+        'city_id': cityId,
+        'zip': zip,
+        'address': address,
+      });
       request.headers.addAll(_getHeaders());
 
       http.StreamedResponse response = await request.send();

@@ -2,14 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/presentation/home/bottom_navigation.dart';
 
-class BookingConfirmation extends StatefulWidget {
-  const BookingConfirmation({super.key});
+class Confirmation extends StatefulWidget {
+  final String title;
+  final String desription;
+
+  const Confirmation({
+    super.key,
+    required this.title,
+    required this.desription,
+  });
 
   @override
-  State<BookingConfirmation> createState() => _BookingConfirmationState();
+  State<Confirmation> createState() => _ConfirmationState();
 }
 
-class _BookingConfirmationState extends State<BookingConfirmation> {
+class _ConfirmationState extends State<Confirmation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +37,7 @@ class _BookingConfirmationState extends State<BookingConfirmation> {
               Image.asset('assets/images/Verified.gif', height: 120.h),
               SizedBox(height: 20.h),
               Text(
-                "Booking Confirmed",
+                widget.title,
                 style: TextStyle(
                   fontWeight: FontWeight.w900,
                   color: Colors.black,
@@ -48,7 +55,7 @@ class _BookingConfirmationState extends State<BookingConfirmation> {
                 child: Center(
                   child: Text(
                     textAlign: TextAlign.center,
-                    "Your booking has been confirmed successfully.",
+                    widget.desription,
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
                       color: Colors.black,

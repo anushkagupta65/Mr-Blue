@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mr_blue/src/core/utils.dart';
+import 'package:mr_blue/src/presentation/schedule_pickup/booking_confirmation.dart';
 import 'package:mr_blue/src/services/api_services.dart';
 
 class AddressScreen extends StatefulWidget {
@@ -16,8 +17,9 @@ class _AddressScreenState extends State<AddressScreen> {
   final _streetController = TextEditingController();
   final _zipController = TextEditingController();
   String? _selectedCity;
-  List<String> _cities = [];
+  List<Map<String, String>> _cities = [];
   bool _isLoadingCities = false;
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -42,7 +44,15 @@ class _AddressScreenState extends State<AddressScreen> {
       if (jsonResponse['Status'] == 'Success') {
         List<dynamic> citiesJson = jsonResponse['Text'];
         setState(() {
-          _cities = citiesJson.map((city) => city['name'].toString()).toList();
+          _cities =
+              citiesJson
+                  .map(
+                    (city) => {
+                      'name': city['name'].toString(),
+                      'id': city['id'].toString(),
+                    },
+                  )
+                  .toList();
           _isLoadingCities = false;
         });
       } else {
@@ -54,33 +64,81 @@ class _AddressScreenState extends State<AddressScreen> {
       setState(() {
         _isLoadingCities = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Failed to load cities: $e',
-            style: GoogleFonts.poppins(),
-          ),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showToastMessage("Failed to load cities: $e");
     }
   }
 
-  void _submitOrder() {
+  void _submitOrder() async {
     if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Order placed with address: ${_streetController.text}, $_selectedCity',
-            style: GoogleFonts.poppins(),
+      setState(() {
+        _isSubmitting = true;
+      });
+
+      // Find the city ID for the selected city
+      String? cityId;
+      for (var city in _cities) {
+        if (city['name'] == _selectedCity) {
+          cityId = city['id'];
+          break;
+        }
+      }
+
+      if (cityId == null) {
+        setState(() {
+          _isSubmitting = false;
+        });
+        showToastMessage("Please select a city");
+        return;
+      }
+
+      try {
+        // Call the addAddress API
+        String responseBody = await ApiService().addAddress(
+          cityId,
+          _streetController.text.trim(),
+          _zipController.text.trim(),
+        );
+
+        // Parse the response
+        Map<String, dynamic> jsonResponse = jsonDecode(responseBody);
+        if (jsonResponse['Status'] == 'Success') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (context) => const Confirmation(
+                    title: 'Address Added',
+                    desription: 'Your address has been added successfully.',
+                  ),
+            ),
+          );
+
+          // Clear the form
+          _streetController.clear();
+          _zipController.clear();
+          setState(() {
+            _selectedCity = null;
+          });
+        } else {
+          throw Exception(
+            'API returned non-success status: ${jsonResponse['Status']}',
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Failed to add address: $e',
+              style: GoogleFonts.poppins(),
+            ),
+            backgroundColor: Colors.red,
           ),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      );
+        );
+      } finally {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
     }
   }
 
@@ -169,8 +227,8 @@ class _AddressScreenState extends State<AddressScreen> {
         items:
             _cities.map((city) {
               return DropdownMenuItem<String>(
-                value: city,
-                child: Text(city, style: GoogleFonts.poppins()),
+                value: city['name'],
+                child: Text(city['name']!, style: GoogleFonts.poppins()),
               );
             }).toList(),
         onChanged: (value) {
@@ -258,10 +316,23 @@ class _AddressScreenState extends State<AddressScreen> {
                             ),
                             _buildCityDropdown(),
                             _buildTextField(
+                              maxLength: 6,
                               controller: _zipController,
                               label: 'ZIP Code',
                               icon: Icons.code_outlined,
                               inputType: TextInputType.number,
+                              validator: (value) {
+                                final trimmedValue = value?.trim() ?? '';
+                                if (trimmedValue.isEmpty) {
+                                  return 'Please enter ZIP code';
+                                }
+                                if (!RegExp(
+                                  r'^\d{6}$',
+                                ).hasMatch(trimmedValue)) {
+                                  return 'ZIP code must be six digits';
+                                }
+                                return null;
+                              },
                             ),
                           ],
                         ),
@@ -272,12 +343,22 @@ class _AddressScreenState extends State<AddressScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: _submitOrder,
-                    icon: const Icon(
-                      Icons.local_shipping_outlined,
-                      size: 22,
-                      color: Colors.white,
-                    ),
+                    onPressed: _isSubmitting ? null : _submitOrder,
+                    icon:
+                        _isSubmitting
+                            ? const SizedBox(
+                              height: 22,
+                              width: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                            : const Icon(
+                              Icons.local_shipping_outlined,
+                              size: 22,
+                              color: Colors.white,
+                            ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue.shade700,
                       padding: const EdgeInsets.symmetric(vertical: 18),
@@ -288,7 +369,7 @@ class _AddressScreenState extends State<AddressScreen> {
                       foregroundColor: Colors.blue,
                     ),
                     label: Text(
-                      'Add Address',
+                      _isSubmitting ? 'Adding...' : 'Add Address',
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
