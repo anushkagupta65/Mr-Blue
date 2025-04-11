@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/drawer/drawer.dart';
+import 'package:mr_blue/src/presentation/schedule_pickup/schedule_pickup.dart';
 import 'dart:convert';
 import 'package:mr_blue/src/services/api_services.dart';
 
@@ -52,14 +53,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Initialize ScreenUtil
-    ScreenUtil.init(
-      context,
-      designSize: const Size(375, 812), // Typical iPhone 11 Pro size
-      minTextAdapt: true,
-      splitScreenMode: true,
-    );
-
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
       child: Scaffold(
@@ -132,65 +125,77 @@ class _HomeScreenState extends State<HomeScreen> {
                               horizontal: 12.w,
                             ),
                             child: SizedBox(
-                              height: 160.h,
+                              height: 120.h,
                               child: Center(
                                 child: ListView.builder(
                                   shrinkWrap: true,
                                   scrollDirection: Axis.horizontal,
-                                  physics: const NeverScrollableScrollPhysics(),
+                                  physics: const BouncingScrollPhysics(),
                                   itemCount: _services.length,
                                   itemBuilder: (context, index) {
                                     final service = _services[index];
-                                    return Padding(
-                                      padding: EdgeInsets.only(
-                                        right: 10.w,
-                                        left: 6.w,
-                                        top: 4.h,
-                                        bottom: 4.h,
-                                      ),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.grey.withOpacity(
-                                                0.5,
-                                              ),
-                                              spreadRadius: 2.r,
-                                              blurRadius: 4.r,
-                                            ),
-                                          ],
-                                          borderRadius: BorderRadius.circular(
-                                            4.r,
+                                    return InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) => BookingScreen(),
                                           ),
+                                        );
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.only(
+                                          right: 10.w,
+                                          left: 6.w,
+                                          top: 4.h,
+                                          bottom: 4.h,
                                         ),
-                                        child: Padding(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 10.w,
-                                            vertical: 6.h,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.grey.withOpacity(
+                                                  0.5,
+                                                ),
+                                                spreadRadius: 2.r,
+                                                blurRadius: 4.r,
+                                              ),
+                                            ],
+                                            borderRadius: BorderRadius.circular(
+                                              4.r,
+                                            ),
                                           ),
-                                          child: InkWell(
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Image.network(
-                                                  service['imageUrl'],
-                                                  fit: BoxFit.fitHeight,
-                                                  width: 68.w,
-                                                ),
-                                                SizedBox(height: 12.h),
-                                                Text(
-                                                  service['name'],
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w700,
-                                                    color: Colors.black,
-                                                    letterSpacing: 1.w,
-                                                    fontSize: 12.sp,
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 10.w,
+                                              vertical: 6.h,
+                                            ),
+                                            child: InkWell(
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Image.network(
+                                                    service['imageUrl'],
+                                                    fit: BoxFit.fitHeight,
+                                                    width: 60.w,
                                                   ),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              ],
+                                                  SizedBox(height: 12.h),
+                                                  Text(
+                                                    service['name'],
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: Colors.black,
+                                                      letterSpacing: 1.w,
+                                                      fontSize: 12.sp,
+                                                    ),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -208,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Column(
                             children: [
-                              SizedBox(height: 32.h),
+                              SizedBox(height: 28.h),
                               SizedBox(
                                 width: double.infinity,
                                 child: ShaderMask(
@@ -241,7 +246,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   TextSpan(
                                     text: 'Picks up, Cleans ',
                                     style: TextStyle(
-                                      fontSize: 28.sp,
+                                      fontSize: 22.sp,
                                       fontWeight: FontWeight.w700,
                                       color: Colors.blue.shade800,
                                     ),
@@ -249,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   TextSpan(
                                     text: 'and ',
                                     style: TextStyle(
-                                      fontSize: 16.sp,
+                                      fontSize: 12.sp,
                                       fontWeight: FontWeight.w700,
                                       color: Colors.black,
                                     ),
@@ -257,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   TextSpan(
                                     text: 'Delivers ',
                                     style: TextStyle(
-                                      fontSize: 28.sp,
+                                      fontSize: 22.sp,
                                       fontWeight: FontWeight.w700,
                                       color: Colors.blue.shade800,
                                     ),
@@ -266,7 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     text:
                                         'your laundry right to your doorstep!',
                                     style: TextStyle(
-                                      fontSize: 16.sp,
+                                      fontSize: 12.sp,
                                       fontWeight: FontWeight.w700,
                                       color: Colors.black,
                                     ),

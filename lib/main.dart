@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:mr_blue/src/presentation/home/bottom_navigation.dart';
 import 'package:mr_blue/src/presentation/splash/splash.dart';
 
 void main() {
@@ -29,7 +28,6 @@ class MyApp extends StatelessWidget {
               child: child!,
             );
           },
-          // home: Bottomnavigation(),
           home: SplashScreen(),
         );
       },

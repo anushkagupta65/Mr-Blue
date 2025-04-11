@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
@@ -12,12 +13,15 @@ Widget customDivider() {
 dynamic customAppBar() {
   return AppBar(
     backgroundColor: Colors.blue.shade700,
-    title: Text(
-      'mr. blue',
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
+    title: Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Text(
+        'mr. blue',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 26.h,
+          fontWeight: FontWeight.w900,
+        ),
       ),
     ),
     centerTitle: true,
@@ -32,7 +36,7 @@ void showToastMessage(String message) {
     gravity: ToastGravity.CENTER,
     backgroundColor: Colors.lightBlue.shade900,
     textColor: Colors.white,
-    fontSize: 16.0,
+    fontSize: 16.sp,
   );
 }
 
