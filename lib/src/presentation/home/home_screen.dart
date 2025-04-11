@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
       child: Scaffold(
-        appBar: customAppBar(),
+        appBar: customAppBar("mr. blue"),
         drawer: CustomDrawer(),
         body: Container(
           width: double.infinity,

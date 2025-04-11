@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/drawer/drawer.dart';
-import 'package:mr_blue/src/presentation/profile/profile.dart';
+import 'package:mr_blue/src/presentation/setting/about_us.dart';
+import 'package:mr_blue/src/presentation/setting/profile.dart';
 
 class Setting extends StatefulWidget {
   const Setting({super.key});
@@ -18,7 +19,7 @@ class _SettingState extends State<Setting> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: customAppBar(),
+      appBar: customAppBar("mr. blue"),
       drawer: CustomDrawer(),
       body: Container(
         width: double.infinity,
@@ -64,10 +65,10 @@ class _SettingState extends State<Setting> {
             const SizedBox(height: 10),
             InkWell(
               onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => const AboutUs()),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AboutUs()),
+                );
               },
               child: ListTile(
                 title: Text("About us", style: textStyle),

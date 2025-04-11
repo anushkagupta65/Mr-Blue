@@ -75,7 +75,7 @@ class _MyProfileState extends State<MyProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: customAppBar(),
+      appBar: customAppBar("mr. blue"),
       body: Container(
         width: double.infinity,
         height: double.infinity,

@@ -10,16 +10,16 @@ Widget customDivider() {
   return Divider(color: Colors.blue.shade100, height: 0.4);
 }
 
-dynamic customAppBar() {
+dynamic customAppBar(String title) {
   return AppBar(
     backgroundColor: Colors.blue.shade700,
     title: Padding(
       padding: const EdgeInsets.all(10.0),
       child: Text(
-        'mr. blue',
+        title,
         style: TextStyle(
           color: Colors.white,
-          fontSize: 26.h,
+          fontSize: 22.h,
           fontWeight: FontWeight.w900,
         ),
       ),
