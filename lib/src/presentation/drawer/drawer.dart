@@ -4,6 +4,7 @@ import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/drawer/screens/logout.dart';
 import 'package:mr_blue/src/presentation/drawer/screens/my_orders.dart';
 import 'package:mr_blue/src/presentation/drawer/screens/my_requests.dart';
+import 'package:mr_blue/src/presentation/drawer/screens/price_list.dart';
 import 'package:mr_blue/src/presentation/home/bottom_navigation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -127,7 +128,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 setState(() {
                   _activeDrawerIndex = 0;
                 });
-                Navigator.pushReplacement(
+                Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const Bottomnavigation(),
@@ -193,10 +194,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 setState(() {
                   _activeDrawerIndex = 6;
                 });
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => const PrizeList()),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const PriceList()),
+                );
               },
             ),
             customDivider(),

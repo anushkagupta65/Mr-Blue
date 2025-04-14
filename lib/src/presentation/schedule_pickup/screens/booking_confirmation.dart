@@ -68,11 +68,12 @@ class _ConfirmationState extends State<Confirmation> {
               SizedBox(height: 80.h),
               InkWell(
                 onTap: () {
-                  Navigator.pushReplacement(
+                  Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const Bottomnavigation(),
                     ),
+                    (route) => false,
                   );
                 },
                 child: Container(

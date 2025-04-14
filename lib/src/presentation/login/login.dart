@@ -55,9 +55,10 @@ class _LoginScreenState extends State<LoginScreen> {
       String userId = responseData['user']['id'].toString();
 
       if (mounted) {
-        Navigator.push(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => VerifyOtpScreen(userId)),
+          (route) => false,
         );
       }
     } catch (e) {
