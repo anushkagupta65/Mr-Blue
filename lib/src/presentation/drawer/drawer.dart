@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/drawer/screens/logout.dart';
+import 'package:mr_blue/src/presentation/drawer/screens/my_orders.dart';
 import 'package:mr_blue/src/presentation/drawer/screens/my_requests.dart';
 import 'package:mr_blue/src/presentation/home/bottom_navigation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -160,10 +161,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 setState(() {
                   _activeDrawerIndex = 4;
                 });
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => const OrderScreen()),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MyOrders()),
+                );
               },
             ),
             customDivider(),
