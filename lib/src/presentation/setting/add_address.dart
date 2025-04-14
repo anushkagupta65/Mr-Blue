@@ -125,15 +125,7 @@ class _AddressScreenState extends State<AddressScreen> {
           );
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Failed to add address: $e',
-              style: GoogleFonts.poppins(),
-            ),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showToastMessage("Failed to add address: $e");
       } finally {
         setState(() {
           _isSubmitting = false;

@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/schedule_pickup/order_summary.dart';
-import 'package:mr_blue/src/services/api_services.dart';
 
 class BookingScreen extends StatefulWidget {
   const BookingScreen({super.key});
@@ -28,6 +28,65 @@ class _BookingScreenState extends State<BookingScreen> {
   List<dynamic> addresses = [];
   bool isLoading = false;
   String userId = '123';
+  final DateTime currentDate = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    // Automatically select today's date and load time slots
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      onDateTap(context, currentDate, setState, userId);
+    });
+  }
+
+  Future<void> fetchTime() async {
+    bool isToday =
+        selectedDate != null &&
+        selectedDate!.year == currentDate.year &&
+        selectedDate!.month == currentDate.month &&
+        selectedDate!.day == currentDate.day;
+    finalHour =
+        isToday
+            ? DateFormat('HH').format(DateTime.now().add(Duration(hours: 2)))
+            : '06';
+
+    if (finalDate.isNotEmpty && finalHour.isNotEmpty) {
+      final response = await http.get(
+        Uri.parse(
+          'https://fabspin.org/api/check-available-time/$finalDate/$finalHour/pick',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          availableTimes = List<Map<String, dynamic>>.from(
+            json.decode(response.body),
+          );
+        });
+      } else {
+        throw Exception('Failed to load data');
+      }
+    }
+  }
+
+  DateTime? getSelectedDateTime() {
+    if (selectedDate != null && timeid != null) {
+      final selectedTime = availableTimes.firstWhere(
+        (time) => time['id'] == timeid,
+        orElse: () => {},
+      );
+      if (selectedTime.isNotEmpty) {
+        int startHour = selectedTime['start_time'];
+        return DateTime(
+          selectedDate!.year,
+          selectedDate!.month,
+          selectedDate!.day,
+          startHour,
+        );
+      }
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -254,12 +313,11 @@ class _BookingScreenState extends State<BookingScreen> {
                         vertical: 4.h,
                       ),
                       onSelected: (selected) {
-                        if (selected) {
+                        if (selected)
                           setState(() {
                             selectedValue = 1;
                             expressService = 0;
                           });
-                        }
                       },
                     ),
                   ),
@@ -270,14 +328,19 @@ class _BookingScreenState extends State<BookingScreen> {
               padding: EdgeInsets.all(12.r),
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder:
-                          (context) => OrderSummaryScreen(
-                            pickupDateTime: DateTime.now(),
-                          ),
-                    ),
-                  );
+                  DateTime? pickupDateTime = getSelectedDateTime();
+                  if (pickupDateTime != null) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder:
+                            (context) => OrderSummaryScreen(
+                              pickupDateTime: pickupDateTime,
+                            ),
+                      ),
+                    );
+                  } else {
+                    showToastMessage('Please select a date and time slot');
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue.shade700,
@@ -312,19 +375,13 @@ class _BookingScreenState extends State<BookingScreen> {
     setState(() {
       selectedDate = date;
       finalDate = DateFormat('yyyy-MM-dd').format(date);
-      finalHour =
-          date.day == DateTime.now().day &&
-                  date.month == DateTime.now().month &&
-                  date.year == DateTime.now().year
-              ? DateFormat('HH').format(DateTime.now())
-              : '06';
       availableTimes.clear();
       isLoading = true;
+      timeid = null; // Reset time selection when date changes
     });
     try {
-      final result = await ApiService().checkAvailableTime(finalDate);
+      await fetchTime();
       setState(() {
-        availableTimes = List<Map<String, dynamic>>.from(jsonDecode(result));
         isLoading = false;
       });
     } catch (e) {
