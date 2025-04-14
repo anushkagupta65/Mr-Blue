@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
+import 'package:mr_blue/src/presentation/drawer/screens/logout.dart';
+import 'package:mr_blue/src/presentation/drawer/screens/my_requests.dart';
+import 'package:mr_blue/src/presentation/home/bottom_navigation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -123,12 +126,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 setState(() {
                   _activeDrawerIndex = 0;
                 });
-                // Navigator.pushReplacement(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => const Bottomnavigation(),
-                //   ),
-                // );
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const Bottomnavigation(),
+                  ),
+                );
               },
             ),
             customDivider(),
@@ -141,10 +144,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 setState(() {
                   _activeDrawerIndex = 3;
                 });
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => MyRequest()),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyRequests()),
+                );
               },
             ),
             customDivider(),
@@ -221,7 +224,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 setState(() {
                   _activeDrawerIndex = 9;
                 });
-                // _handleLogout();
+                Navigator.pop(context);
+                LogoutDialog.show(context);
               },
             ),
           ],

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mr_blue/src/core/utils.dart';
-import 'package:mr_blue/src/presentation/schedule_pickup/booking_confirmation.dart';
+import 'package:mr_blue/src/presentation/schedule_pickup/screens/booking_confirmation.dart';
 import 'package:mr_blue/src/services/api_services.dart';
 
 class AddressScreen extends StatefulWidget {

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/drawer/drawer.dart';
-import 'package:mr_blue/src/presentation/setting/about_us.dart';
-import 'package:mr_blue/src/presentation/setting/addresses.dart';
-import 'package:mr_blue/src/presentation/setting/profile.dart';
+import 'package:mr_blue/src/presentation/setting/screens/about_us.dart';
+import 'package:mr_blue/src/presentation/setting/screens/addresses.dart';
+import 'package:mr_blue/src/presentation/setting/screens/profile.dart';
 
 class Setting extends StatefulWidget {
   const Setting({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
-import 'package:mr_blue/src/presentation/schedule_pickup/booking_confirmation.dart';
+import 'package:mr_blue/src/presentation/schedule_pickup/screens/booking_confirmation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 

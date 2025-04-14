@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mr_blue/src/core/utils.dart';
-import 'package:mr_blue/src/presentation/setting/add_address.dart';
+import 'package:mr_blue/src/presentation/setting/screens/add_address.dart';
 
 class AddAddressStatic extends StatefulWidget {
   const AddAddressStatic({super.key});

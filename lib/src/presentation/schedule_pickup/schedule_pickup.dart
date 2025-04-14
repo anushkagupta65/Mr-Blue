@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:mr_blue/src/core/utils.dart';
-import 'package:mr_blue/src/presentation/schedule_pickup/order_summary.dart';
+import 'package:mr_blue/src/presentation/schedule_pickup/screens/order_summary.dart';
 
 class BookingScreen extends StatefulWidget {
   const BookingScreen({super.key});
