@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/home/home_screen.dart';
 import 'package:mr_blue/src/presentation/setting/settings.dart';
+import 'package:mr_blue/src/services/api_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Bottomnavigation extends StatefulWidget {
   const Bottomnavigation({super.key});
@@ -14,6 +16,38 @@ class Bottomnavigation extends StatefulWidget {
 class _BottomnavigationState extends State<Bottomnavigation> {
   int _selectedIndex = 0;
   final List<Widget> _pages = [HomeScreen(), Setting()];
+  final ApiService _apiService = ApiService();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchLocationAndPost();
+  }
+
+  Future<void> _fetchLocationAndPost() async {
+    try {
+      print('DEBUG: Starting to fetch location from SharedPreferences');
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      String? latitude = prefs.getDouble('latitude').toString();
+      String? longitude = prefs.getDouble('longitude').toString();
+
+      print('DEBUG: Latitude: $latitude, Longitude: $longitude');
+
+      if (latitude != null && longitude != null) {
+        print('DEBUG: Calling postUserLocation API');
+        String response = await _apiService.postUserLocation(
+          latitude,
+          longitude,
+        );
+        print('DEBUG: API Response: $response');
+      } else {
+        print('DEBUG: Latitude or Longitude not found in SharedPreferences');
+      }
+    } catch (e) {
+      print('DEBUG: Error occurred: $e');
+    }
+  }
 
   void _onItemTapped(int index) {
     if (index == 0 || index == 1) {

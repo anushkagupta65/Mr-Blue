@@ -23,6 +23,7 @@ class _MapScreenState extends State<MapScreen> {
   LatLng? _currentPosition;
   LatLng? _selectedPosition;
   final Set<Marker> _markers = {};
+  final _formKey = GlobalKey<FormState>();
 
   TextEditingController house = TextEditingController();
   TextEditingController street = TextEditingController();
@@ -203,88 +204,132 @@ class _MapScreenState extends State<MapScreen> {
                 ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12.h),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            _currentAddress ?? 'Fetching address...',
-                            softWrap: true,
-                            textAlign: TextAlign.left,
-                            maxLines: 2,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black87,
-                              fontSize: 12.sp,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12.h),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              _currentAddress ??
+                                  'Please wait while we fetch address for you....',
+                              softWrap: true,
+                              textAlign: TextAlign.left,
+                              maxLines: 2,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black87,
+                                fontSize: 12.sp,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 8.h),
-                    child: TextField(
-                      controller: house,
-                      decoration: InputDecoration(
-                        hintText:
-                            'Flat No./Suite No./Building No./Block (Optional)',
-                        hintStyle: TextStyle(
-                          fontSize: 10.sp,
-                          color: Colors.grey[600],
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 8.h),
+                      child: TextFormField(
+                        controller: house,
+                        decoration: InputDecoration(
+                          hintText: 'Flat No./Suite No./Building No./Block *',
+                          hintStyle: TextStyle(
+                            fontSize: 10.sp,
+                            color: Colors.grey[600],
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.blue.shade700),
+                            borderRadius: BorderRadius.circular(4.r),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 12.h,
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(color: Colors.red),
+                            borderRadius: BorderRadius.circular(4.r),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(color: Colors.red),
+                            borderRadius: BorderRadius.circular(4.r),
+                          ),
                         ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue.shade700),
-                          borderRadius: BorderRadius.circular(4.r),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16.w,
-                          vertical: 12.h,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'This field is mandatory';
+                          }
+                          return null;
+                        },
+                        onChanged: (value) {
+                          if (_formKey.currentState != null) {
+                            _formKey.currentState!.validate();
+                          }
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 8.h),
+                      child: TextField(
+                        controller: street,
+                        decoration: InputDecoration(
+                          hintText: 'Street/Society/Landmark (Optional)',
+                          hintStyle: TextStyle(
+                            fontSize: 10.sp,
+                            color: Colors.grey[600],
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.blue.shade700),
+                            borderRadius: BorderRadius.circular(4.r),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 12.h,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 8.h),
-                    child: TextField(
-                      controller: street,
-                      decoration: InputDecoration(
-                        hintText: 'Street/Society/Landmark (Optional)',
-                        hintStyle: TextStyle(
-                          fontSize: 10.sp,
-                          color: Colors.grey[600],
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.h),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue.shade700,
+                          minimumSize: Size(double.infinity, 40.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24.r),
+                          ),
                         ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue.shade700),
-                          borderRadius: BorderRadius.circular(4.r),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16.w,
-                          vertical: 12.h,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.h),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue.shade700,
-                        minimumSize: Size(double.infinity, 40.h),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24.r),
-                        ),
-                      ),
-                      onPressed: () async {
-                        if (_selectedPosition != null) {
+                        onPressed: () async {
+                          if (_selectedPosition == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Please select a location on the map',
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+
+                          if (!_formKey.currentState!.validate()) {
+                            return;
+                          }
+
+                          String finalAddress = house.text.trim();
+                          if (_currentAddress != null &&
+                              _currentAddress!.isNotEmpty) {
+                            finalAddress += ", $_currentAddress";
+                          }
+                          if (street.text.trim().isNotEmpty) {
+                            finalAddress += ", ${street.text.trim()}";
+                          }
+
                           showToastMessage("Location confirmed");
                           await Future.delayed(const Duration(seconds: 2));
                           Navigator.of(context).pushReplacement(
@@ -293,31 +338,23 @@ class _MapScreenState extends State<MapScreen> {
                                   (context) => Confirmation(
                                     title: "Location Added",
                                     desription:
-                                        "Your new location has been added successfully",
+                                        "Your new location has been added successfully: $finalAddress",
                                   ),
                             ),
                           );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Please select a location on the map',
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                      child: Text(
-                        'Confirm Location',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                          fontSize: 16.sp,
+                        },
+                        child: Text(
+                          'Confirm Location',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                            fontSize: 16.sp,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
