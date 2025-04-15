@@ -201,6 +201,85 @@ class ApiService {
     }
   }
 
+  // ================================================================ TO POST USER'S LOCATION ===================================================
+  /// Posts the user's location with latitude and longitude.
+  Future<String> postUserLocation(String latitude, String longitude) async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$_baseUrl/new-user-time-slot'),
+      );
+
+      request.fields.addAll({'latitude': latitude, 'longitude': longitude});
+      request.headers.addAll(_getHeaders());
+
+      http.StreamedResponse response = await request.send();
+
+      String responseBody = await response.stream.bytesToString();
+      if (response.statusCode == 200) {
+        return responseBody;
+      } else {
+        throw Exception(
+          'Failed: ${response.statusCode} - ${response.reasonPhrase}',
+        );
+      }
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  // ================================================================ TO GET LAUNDRY PRICE DETAILS ===================================================
+  /// Fetches the laundry price details for a given region.
+  Future<String> getLaundryPriceDetails(String regionId) async {
+    try {
+      var request = http.Request(
+        'GET',
+        Uri.parse('$_baseUrl/new-user-get-price-services/$regionId'),
+      );
+
+      request.headers.addAll(_getHeaders());
+
+      http.StreamedResponse response = await request.send();
+
+      String responseBody = await response.stream.bytesToString();
+      if (response.statusCode == 200) {
+        return responseBody;
+      } else {
+        throw Exception(
+          'Failed: ${response.statusCode} - ${response.reasonPhrase}',
+        );
+      }
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  // ================================================================ TO GET DRY CLEANING PRICE DETAILS ===================================================
+  /// Fetches the dry cleaning price details for a given region.
+  Future<String> getDryCleaningPriceDetails(String regionId) async {
+    try {
+      var request = http.Request(
+        'GET',
+        Uri.parse('$_baseUrl/pricelists/$regionId'),
+      );
+
+      request.headers.addAll(_getHeaders());
+
+      http.StreamedResponse response = await request.send();
+
+      String responseBody = await response.stream.bytesToString();
+      if (response.statusCode == 200) {
+        return responseBody;
+      } else {
+        throw Exception(
+          'Failed: ${response.statusCode} - ${response.reasonPhrase}',
+        );
+      }
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
   // ================================================================ TO HANDLE EXCEPTION ===================================================
   /// Handles errors that occur during API requests.
   Exception _handleError(dynamic error) {

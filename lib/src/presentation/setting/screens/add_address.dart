@@ -254,123 +254,125 @@ class _AddressScreenState extends State<AddressScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: customAppBar("Add Address"),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.white, Colors.blue.shade100],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+      body: SafeArea(
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.white, Colors.blue.shade100],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
           ),
-        ),
-        child: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  children: [
-                    Text(
-                      'Delivery Address',
-                      style: GoogleFonts.poppins(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blueGrey[900],
+          child: Form(
+            key: _formKey,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    children: [
+                      Text(
+                        'Delivery Address',
+                        style: GoogleFonts.poppins(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueGrey[900],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Please fill in the details below to add a new address.',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        color: Colors.grey[600],
+                      const SizedBox(height: 8),
+                      Text(
+                        'Please fill in the details below to add a new address.',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    Card(
-                      color: const Color.fromARGB(255, 197, 229, 255),
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
+                      const SizedBox(height: 24),
+                      Card(
+                        color: const Color.fromARGB(255, 197, 229, 255),
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              _buildTextField(
+                                controller: _streetController,
+                                label: 'Street Address',
+                                icon: Icons.location_on_outlined,
+                              ),
+                              _buildCityDropdown(),
+                              _buildTextField(
+                                maxLength: 6,
+                                controller: _zipController,
+                                label: 'ZIP Code',
+                                icon: Icons.code_outlined,
+                                inputType: TextInputType.number,
+                                validator: (value) {
+                                  final trimmedValue = value?.trim() ?? '';
+                                  if (trimmedValue.isEmpty) {
+                                    return 'Please enter ZIP code';
+                                  }
+                                  if (!RegExp(
+                                    r'^\d{6}$',
+                                  ).hasMatch(trimmedValue)) {
+                                    return 'ZIP code must be six digits';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          children: [
-                            _buildTextField(
-                              controller: _streetController,
-                              label: 'Street Address',
-                              icon: Icons.location_on_outlined,
-                            ),
-                            _buildCityDropdown(),
-                            _buildTextField(
-                              maxLength: 6,
-                              controller: _zipController,
-                              label: 'ZIP Code',
-                              icon: Icons.code_outlined,
-                              inputType: TextInputType.number,
-                              validator: (value) {
-                                final trimmedValue = value?.trim() ?? '';
-                                if (trimmedValue.isEmpty) {
-                                  return 'Please enter ZIP code';
-                                }
-                                if (!RegExp(
-                                  r'^\d{6}$',
-                                ).hasMatch(trimmedValue)) {
-                                  return 'ZIP code must be six digits';
-                                }
-                                return null;
-                              },
-                            ),
-                          ],
+                    ],
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: _isSubmitting ? null : _submitOrder,
+                      icon:
+                          _isSubmitting
+                              ? const SizedBox(
+                                height: 22,
+                                width: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                              : const Icon(
+                                Icons.local_shipping_outlined,
+                                size: 22,
+                                color: Colors.white,
+                              ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue.shade700,
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        foregroundColor: Colors.blue,
+                      ),
+                      label: Text(
+                        _isSubmitting ? 'Adding...' : 'Add Address',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
                       ),
                     ),
-                  ],
-                ),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: _isSubmitting ? null : _submitOrder,
-                    icon:
-                        _isSubmitting
-                            ? const SizedBox(
-                              height: 22,
-                              width: 22,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                            : const Icon(
-                              Icons.local_shipping_outlined,
-                              size: 22,
-                              color: Colors.white,
-                            ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue.shade700,
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      foregroundColor: Colors.blue,
-                    ),
-                    label: Text(
-                      _isSubmitting ? 'Adding...' : 'Add Address',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

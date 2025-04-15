@@ -67,108 +67,113 @@ class _MyRequestsState extends State<MyRequests>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: customAppBar("mr. blue"),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.white, Colors.blue.shade300],
-            begin: Alignment.centerLeft,
-            end: Alignment.bottomRight,
+      body: SafeArea(
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.white, Colors.blue.shade300],
+              begin: Alignment.centerLeft,
+              end: Alignment.bottomRight,
+            ),
           ),
-        ),
-        child: Column(
-          children: [
-            TabBar(
-              labelColor: Colors.white,
-              labelStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-              unselectedLabelColor: Colors.black,
-              indicatorPadding: EdgeInsets.all(6),
-              dividerColor: Colors.blue[900],
-              indicatorSize: TabBarIndicatorSize.tab,
-              indicator: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.blue[800]!,
-                    Colors.blue[400]!,
-                    Colors.blue[800]!,
+          child: Column(
+            children: [
+              TabBar(
+                labelColor: Colors.white,
+                labelStyle: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+                unselectedLabelColor: Colors.black,
+                indicatorPadding: EdgeInsets.all(6),
+                dividerColor: Colors.blue[900],
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicator: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.blue[800]!,
+                      Colors.blue[400]!,
+                      Colors.blue[800]!,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                controller: tabController,
+                tabs: const [Tab(text: 'PICKUPS'), Tab(text: 'DROP OFFS')],
+              ),
+              SizedBox(height: 10),
+              Expanded(
+                child: TabBarView(
+                  controller: tabController,
+                  children: [
+                    ListView.builder(
+                      itemCount: pickups.length,
+                      itemBuilder: (context, index) {
+                        final pickup = pickups[index];
+                        final status = pickup['status'];
+                        final service = pickup['service'];
+
+                        String imgUrl;
+                        if (service == 'Dry Cleaning') {
+                          imgUrl = dryCleanImg;
+                        } else if (service == 'Shoe Cleaning') {
+                          imgUrl = shoeCleanImg;
+                        } else if (service == 'Steam Iron') {
+                          imgUrl = steamIronImg;
+                        } else {
+                          imgUrl = defaultImg;
+                        }
+
+                        return _buildPickupCard(
+                          service: pickup['service'],
+                          bookingCode: pickup['booking_code'],
+                          pickupDate: pickup['pickup_date'],
+                          pickupTime: pickup['pickup_time'],
+                          riderName: pickup['rider_name'],
+                          status: status,
+                          imgUrl: imgUrl,
+                          onClick: () {
+                            // Handle cancel pickup
+                          },
+                        );
+                      },
+                    ),
+                    dropoffs.isEmpty
+                        ? const Center(child: Text("No drop-offs found"))
+                        : ListView.builder(
+                          itemCount: dropoffs.length,
+                          itemBuilder: (context, index) {
+                            final dropoff = dropoffs[index];
+                            final service = dropoff['service_name'];
+
+                            String imgUrl;
+                            if (service == 'Dry Cleaning') {
+                              imgUrl = dryCleanImg;
+                            } else if (service == 'Shoe Cleaning') {
+                              imgUrl = shoeCleanImg;
+                            } else if (service == 'Steam Iron') {
+                              imgUrl = steamIronImg;
+                            } else {
+                              imgUrl = defaultImg;
+                            }
+
+                            return _buildDropoffCard(
+                              service: service,
+                              bookingCode: dropoff['booking_code'],
+                              dropDate: dropoff['drop_date'],
+                              dropTime: dropoff['drop_time'],
+                              riderName: dropoff['rider_name'],
+                              imgUrl: imgUrl,
+                            );
+                          },
+                        ),
                   ],
                 ),
-                borderRadius: BorderRadius.circular(8),
               ),
-              controller: tabController,
-              tabs: const [Tab(text: 'PICKUPS'), Tab(text: 'DROP OFFS')],
-            ),
-            SizedBox(height: 10),
-            Expanded(
-              child: TabBarView(
-                controller: tabController,
-                children: [
-                  ListView.builder(
-                    itemCount: pickups.length,
-                    itemBuilder: (context, index) {
-                      final pickup = pickups[index];
-                      final status = pickup['status'];
-                      final service = pickup['service'];
-
-                      String imgUrl;
-                      if (service == 'Dry Cleaning') {
-                        imgUrl = dryCleanImg;
-                      } else if (service == 'Shoe Cleaning') {
-                        imgUrl = shoeCleanImg;
-                      } else if (service == 'Steam Iron') {
-                        imgUrl = steamIronImg;
-                      } else {
-                        imgUrl = defaultImg;
-                      }
-
-                      return _buildPickupCard(
-                        service: pickup['service'],
-                        bookingCode: pickup['booking_code'],
-                        pickupDate: pickup['pickup_date'],
-                        pickupTime: pickup['pickup_time'],
-                        riderName: pickup['rider_name'],
-                        status: status,
-                        imgUrl: imgUrl,
-                        onClick: () {
-                          // Handle cancel pickup
-                        },
-                      );
-                    },
-                  ),
-                  dropoffs.isEmpty
-                      ? const Center(child: Text("No drop-offs found"))
-                      : ListView.builder(
-                        itemCount: dropoffs.length,
-                        itemBuilder: (context, index) {
-                          final dropoff = dropoffs[index];
-                          final service = dropoff['service_name'];
-
-                          String imgUrl;
-                          if (service == 'Dry Cleaning') {
-                            imgUrl = dryCleanImg;
-                          } else if (service == 'Shoe Cleaning') {
-                            imgUrl = shoeCleanImg;
-                          } else if (service == 'Steam Iron') {
-                            imgUrl = steamIronImg;
-                          } else {
-                            imgUrl = defaultImg;
-                          }
-
-                          return _buildDropoffCard(
-                            service: service,
-                            bookingCode: dropoff['booking_code'],
-                            dropDate: dropoff['drop_date'],
-                            dropTime: dropoff['drop_time'],
-                            riderName: dropoff['rider_name'],
-                            imgUrl: imgUrl,
-                          );
-                        },
-                      ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

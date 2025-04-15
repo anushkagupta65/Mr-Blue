@@ -76,68 +76,35 @@ class _MyProfileState extends State<MyProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: customAppBar("mr. blue"),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.white, Colors.blue.shade100],
-            end: Alignment.topCenter,
-            begin: Alignment.bottomCenter,
+      body: SafeArea(
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.white, Colors.blue.shade100],
+              end: Alignment.topCenter,
+              begin: Alignment.bottomCenter,
+            ),
           ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    backgroundColor: Colors.white,
-                    radius: 80.r,
-                    child: Image.asset(
-                      'assets/images/mr-blue-logo.png',
-                      fit: BoxFit.cover,
-                      height: 64.h,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 80.r,
+                      child: Image.asset(
+                        'assets/images/mr-blue-logo.png',
+                        fit: BoxFit.cover,
+                        height: 64.h,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 20),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.blue.shade900),
-                    ),
-                    child: Row(
-                      children: [
-                        SizedBox(width: 8),
-                        Icon(Icons.person_outline, color: Colors.blue.shade900),
-                        SizedBox(width: 15),
-                        Expanded(
-                          child: TextField(
-                            controller: _name,
-                            decoration: InputDecoration(
-                              hintStyle: TextStyle(color: Colors.blue.shade900),
-                              hintText: "Name",
-                              border: InputBorder.none,
-                            ),
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Colors.blue.shade900,
-                              letterSpacing: 1,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 15),
-                  InkWell(
-                    onTap: () {
-                      showToastMessage("Contact number cannot be changed");
-                    },
-                    child: Container(
+                    SizedBox(height: 20),
+                    Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: Colors.blue.shade900),
@@ -145,12 +112,21 @@ class _MyProfileState extends State<MyProfile> {
                       child: Row(
                         children: [
                           SizedBox(width: 8),
-                          Icon(Icons.phone, color: Colors.blue.shade900),
-                          SizedBox(width: 2),
-                          Padding(
-                            padding: const EdgeInsets.all(15),
-                            child: Text(
-                              _mobile,
+                          Icon(
+                            Icons.person_outline,
+                            color: Colors.blue.shade900,
+                          ),
+                          SizedBox(width: 15),
+                          Expanded(
+                            child: TextField(
+                              controller: _name,
+                              decoration: InputDecoration(
+                                hintStyle: TextStyle(
+                                  color: Colors.blue.shade900,
+                                ),
+                                hintText: "Name",
+                                border: InputBorder.none,
+                              ),
                               style: TextStyle(
                                 fontWeight: FontWeight.w500,
                                 color: Colors.blue.shade900,
@@ -162,63 +138,96 @@ class _MyProfileState extends State<MyProfile> {
                         ],
                       ),
                     ),
-                  ),
-                  SizedBox(height: 15),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.blue.shade900),
-                    ),
-                    child: Row(
-                      children: [
-                        SizedBox(width: 8),
-                        Icon(Icons.mail, color: Colors.blue.shade900),
-                        SizedBox(width: 15),
-                        Expanded(
-                          child: TextField(
-                            controller: _email,
-                            decoration: InputDecoration(
-                              hintText: "Email",
-                              hintStyle: TextStyle(color: Colors.blue.shade900),
-                              border: InputBorder.none,
+                    SizedBox(height: 15),
+                    InkWell(
+                      onTap: () {
+                        showToastMessage("Contact number cannot be changed");
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.blue.shade900),
+                        ),
+                        child: Row(
+                          children: [
+                            SizedBox(width: 8),
+                            Icon(Icons.phone, color: Colors.blue.shade900),
+                            SizedBox(width: 2),
+                            Padding(
+                              padding: const EdgeInsets.all(15),
+                              child: Text(
+                                _mobile,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.blue.shade900,
+                                  letterSpacing: 1,
+                                  fontSize: 12,
+                                ),
+                              ),
                             ),
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Colors.blue.shade900,
-                              letterSpacing: 1,
-                              fontSize: 12,
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 15),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.blue.shade900),
+                      ),
+                      child: Row(
+                        children: [
+                          SizedBox(width: 8),
+                          Icon(Icons.mail, color: Colors.blue.shade900),
+                          SizedBox(width: 15),
+                          Expanded(
+                            child: TextField(
+                              controller: _email,
+                              decoration: InputDecoration(
+                                hintText: "Email",
+                                hintStyle: TextStyle(
+                                  color: Colors.blue.shade900,
+                                ),
+                                border: InputBorder.none,
+                              ),
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Colors.blue.shade900,
+                                letterSpacing: 1,
+                                fontSize: 12,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue.shade700,
+                    padding: EdgeInsets.symmetric(horizontal: 56, vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue.shade700,
-                  padding: EdgeInsets.symmetric(horizontal: 56, vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                onPressed: _updateProfile,
-                child: Text(
-                  'Update Profile',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                    letterSpacing: 1,
-                    fontSize: 15,
+                  onPressed: _updateProfile,
+                  child: Text(
+                    'Update Profile',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                      letterSpacing: 1,
+                      fontSize: 15,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

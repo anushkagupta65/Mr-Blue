@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
+import 'package:mr_blue/src/presentation/login/terms_and_conditions.dart';
 import 'package:mr_blue/src/presentation/login/verify_otp.dart';
 import 'package:mr_blue/src/services/api_services.dart';
 
@@ -178,7 +179,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              // Navigate to terms and conditions page
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => const TermsAndConditions(),
+                                ),
+                              );
                             },
                             child: Text(
                               "Accept Terms & Conditions.",
