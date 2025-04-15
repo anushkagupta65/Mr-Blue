@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/drawer/drawer.dart';
+import 'package:mr_blue/src/presentation/home/map_screen.dart';
 import 'package:mr_blue/src/presentation/schedule_pickup/schedule_pickup.dart';
 import 'dart:convert';
 import 'package:mr_blue/src/services/api_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,12 +21,34 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> _filteredServices = [];
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
+  String _displayAddress = "Add Location";
 
   @override
   void initState() {
     super.initState();
     _fetchServices();
     _searchController.addListener(_onSearchTextChanged);
+    _loadSavedAddress();
+  }
+
+  Future<void> _loadSavedAddress() async {
+    final prefs = await SharedPreferences.getInstance();
+    final addressId = prefs.getInt('selected_address_id');
+    if (addressId != null) {
+      final house = prefs.getString('selected_address_house') ?? '';
+      final landmark = prefs.getString('selected_address_landmark') ?? '';
+      final address = prefs.getString('selected_address_address') ?? '';
+      setState(() {
+        _displayAddress =
+            house.isNotEmpty
+                ? '$house, $landmark, $address'
+                : '$landmark, $address';
+      });
+    } else {
+      setState(() {
+        _displayAddress = "Add Location";
+      });
+    }
   }
 
   Future<void> _fetchServices() async {
@@ -83,7 +107,35 @@ class _HomeScreenState extends State<HomeScreen> {
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
       child: Scaffold(
-        appBar: customAppBar("mr. blue"),
+        appBar: AppBar(
+          backgroundColor: Colors.blue.shade700,
+          title: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MapScreen()),
+              );
+            },
+            child: Row(
+              children: [
+                Icon(Icons.location_pin, color: Colors.white, size: 16.h),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: Text(
+                    _displayAddress,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.w900,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          iconTheme: IconThemeData(color: Colors.white),
+        ),
         drawer: CustomDrawer(),
         body: SafeArea(
           child: Container(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/setting/screens/add_address.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddAddressStatic extends StatefulWidget {
   const AddAddressStatic({super.key});
@@ -52,14 +53,53 @@ class _AddAddressStaticState extends State<AddAddressStatic> {
           return '$house, $landmark, $mainAddress';
         }).toList();
 
-    final defaultAddressIndex = _addresses.indexWhere(
-      (address) => address['default'] == 1,
-    );
-    _selectedAddressIndex =
-        defaultAddressIndex >= 0 ? defaultAddressIndex : null;
+    // final defaultAddressIndex = _addresses.indexWhere(
+    //   (address) => address['default'] == 1,
+    // );
+    // _selectedAddressIndex =
+    //     defaultAddressIndex >= 0 ? defaultAddressIndex : null;
+
+    // Load the saved address from SharedPreferences
+    _loadSavedAddress();
   }
 
-  void _setDefaultAddress(int index) {
+  Future<void> _loadSavedAddress() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedAddressId = prefs.getInt('selected_address_id');
+    if (savedAddressId != null) {
+      final index = _addresses.indexWhere(
+        (address) => address['id'] == savedAddressId,
+      );
+      if (index >= 0) {
+        setState(() {
+          _selectedAddressIndex = index;
+          for (var i = 0; i < _addresses.length; i++) {
+            _addresses[i]['default'] = i == index ? 1 : 0;
+          }
+        });
+      }
+    }
+  }
+
+  Future<void> _setDefaultAddress(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    final selectedAddress = _addresses[index];
+
+    // Save the selected address to SharedPreferences
+    await prefs.setInt('selected_address_id', selectedAddress['id']);
+    await prefs.setString(
+      'selected_address_house',
+      selectedAddress['house'] ?? '',
+    );
+    await prefs.setString(
+      'selected_address_landmark',
+      selectedAddress['landmark'] ?? '',
+    );
+    await prefs.setString(
+      'selected_address_address',
+      selectedAddress['address'] ?? '',
+    );
+
     setState(() {
       for (var i = 0; i < _addresses.length; i++) {
         _addresses[i]['default'] = i == index ? 1 : 0;
@@ -68,7 +108,8 @@ class _AddAddressStaticState extends State<AddAddressStatic> {
     });
   }
 
-  void _deleteAddress(int addressId) {
+  void _deleteAddress(int addressId) async {
+    final prefs = await SharedPreferences.getInstance();
     setState(() {
       _addresses.removeWhere((address) => address['id'] == addressId);
       _addressAll =
@@ -82,6 +123,15 @@ class _AddAddressStaticState extends State<AddAddressStatic> {
       if (_selectedAddressIndex != null &&
           _selectedAddressIndex! >= _addresses.length) {
         _selectedAddressIndex = _addresses.isNotEmpty ? 0 : null;
+        if (_selectedAddressIndex != null) {
+          _setDefaultAddress(_selectedAddressIndex!);
+        } else {
+          // Clear SharedPreferences if no addresses remain
+          prefs.remove('selected_address_id');
+          prefs.remove('selected_address_house');
+          prefs.remove('selected_address_landmark');
+          prefs.remove('selected_address_address');
+        }
       }
     });
   }
