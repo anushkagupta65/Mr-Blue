@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
 
 class MyRequests extends StatefulWidget {
@@ -12,7 +13,6 @@ class _MyRequestsState extends State<MyRequests>
     with SingleTickerProviderStateMixin {
   TabController? tabController;
 
-  // Dummy data for UI
   final List<Map<String, dynamic>> pickups = [
     {
       'service': 'Dry Cleaning',
@@ -84,10 +84,10 @@ class _MyRequestsState extends State<MyRequests>
                 labelColor: Colors.white,
                 labelStyle: TextStyle(
                   fontWeight: FontWeight.w600,
-                  fontSize: 14,
+                  fontSize: 14.sp,
                 ),
                 unselectedLabelColor: Colors.black,
-                indicatorPadding: EdgeInsets.all(6),
+                indicatorPadding: EdgeInsets.all(6.w),
                 dividerColor: Colors.blue[900],
                 indicatorSize: TabBarIndicatorSize.tab,
                 indicator: BoxDecoration(
@@ -98,12 +98,12 @@ class _MyRequestsState extends State<MyRequests>
                       Colors.blue[800]!,
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(8.w),
                 ),
                 controller: tabController,
                 tabs: const [Tab(text: 'PICKUPS'), Tab(text: 'DROP OFFS')],
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 10.h),
               Expanded(
                 child: TabBarView(
                   controller: tabController,
@@ -134,14 +134,17 @@ class _MyRequestsState extends State<MyRequests>
                           riderName: pickup['rider_name'],
                           status: status,
                           imgUrl: imgUrl,
-                          onClick: () {
-                            // Handle cancel pickup
-                          },
+                          onClick: () {},
                         );
                       },
                     ),
                     dropoffs.isEmpty
-                        ? const Center(child: Text("No drop-offs found"))
+                        ? Center(
+                          child: Text(
+                            "No drop-offs found",
+                            style: TextStyle(fontSize: 16.sp),
+                          ),
+                        )
                         : ListView.builder(
                           itemCount: dropoffs.length,
                           itemBuilder: (context, index) {
@@ -190,43 +193,44 @@ class _MyRequestsState extends State<MyRequests>
     required VoidCallback onClick,
   }) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: Colors.blue[900]!),
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(8.w),
         boxShadow: [
           BoxShadow(
             color: Colors.blue[100]!.withOpacity(0.3),
-            blurRadius: 5,
-            offset: const Offset(0, 4),
+            blurRadius: 5.w,
+            offset: Offset(0, 4.h),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: EdgeInsets.symmetric(vertical: 4.h),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(width: 16),
+            SizedBox(width: 16.w),
             Container(
-              width: 80,
-              height: 100,
+              width: 72.w,
+              height: 72.h,
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.blue[900]!),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(8.w),
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(8.w),
                 child: Image.network(
                   imgUrl,
                   fit: BoxFit.cover,
                   errorBuilder:
-                      (context, error, stackTrace) => const Icon(Icons.error),
+                      (context, error, stackTrace) =>
+                          Icon(Icons.error, size: 40.w),
                 ),
               ),
             ),
-            const SizedBox(width: 20),
+            SizedBox(width: 20.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,10 +238,10 @@ class _MyRequestsState extends State<MyRequests>
                   Text(
                     service,
                     style: TextStyle(
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w800,
                       color: Colors.blue[900],
                       letterSpacing: 1,
-                      fontSize: 16,
+                      fontSize: 16.sp,
                     ),
                   ),
                   Text(
@@ -245,7 +249,7 @@ class _MyRequestsState extends State<MyRequests>
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       color: Colors.black87,
-                      fontSize: 12,
+                      fontSize: 10.sp,
                     ),
                   ),
                   Text(
@@ -253,7 +257,7 @@ class _MyRequestsState extends State<MyRequests>
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       color: Colors.black87,
-                      fontSize: 12,
+                      fontSize: 10.sp,
                     ),
                   ),
                   Text(
@@ -261,7 +265,7 @@ class _MyRequestsState extends State<MyRequests>
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       color: Colors.black87,
-                      fontSize: 12,
+                      fontSize: 10.sp,
                     ),
                   ),
                   Text(
@@ -269,28 +273,28 @@ class _MyRequestsState extends State<MyRequests>
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       color: Colors.black87,
-                      fontSize: 12,
+                      fontSize: 10.sp,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10.h),
                   status == 1
                       ? InkWell(
                         onTap: onClick,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 8,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20.w,
+                            vertical: 8.h,
                           ),
                           decoration: BoxDecoration(
                             color: Colors.blue[900],
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(8.w),
                           ),
                           child: Text(
                             "Cancel Pickup",
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
-                              fontSize: 12,
+                              fontSize: 12.sp,
                             ),
                           ),
                         ),
@@ -300,13 +304,13 @@ class _MyRequestsState extends State<MyRequests>
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           color: Colors.red[700],
-                          fontSize: 14,
+                          fontSize: 12.sp,
                         ),
                       ),
                 ],
               ),
             ),
-            const SizedBox(width: 15),
+            SizedBox(width: 15.w),
           ],
         ),
       ),
@@ -322,43 +326,44 @@ class _MyRequestsState extends State<MyRequests>
     required String imgUrl,
   }) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: Colors.blue[900]!),
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(8.w),
         boxShadow: [
           BoxShadow(
             color: Colors.blue[100]!.withOpacity(0.3),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+            blurRadius: 5.w,
+            offset: Offset(0, 2.h),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 15),
+        padding: EdgeInsets.symmetric(vertical: 8.h),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(width: 15),
+            SizedBox(width: 15.w),
             Container(
-              width: 80,
-              height: 100,
+              width: 72.w,
+              height: 72.h,
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.blue[900]!),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(8.w),
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(8.w),
                 child: Image.network(
                   imgUrl,
                   fit: BoxFit.cover,
                   errorBuilder:
-                      (context, error, stackTrace) => const Icon(Icons.error),
+                      (context, error, stackTrace) =>
+                          Icon(Icons.error, size: 40.w),
                 ),
               ),
             ),
-            const SizedBox(width: 20),
+            SizedBox(width: 20.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -369,7 +374,7 @@ class _MyRequestsState extends State<MyRequests>
                       fontWeight: FontWeight.w700,
                       color: Colors.blue[900],
                       letterSpacing: 1,
-                      fontSize: 16,
+                      fontSize: 16.sp,
                     ),
                   ),
                   Text(
@@ -377,7 +382,7 @@ class _MyRequestsState extends State<MyRequests>
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       color: Colors.black87,
-                      fontSize: 12,
+                      fontSize: 10.sp,
                     ),
                   ),
                   Text(
@@ -385,7 +390,7 @@ class _MyRequestsState extends State<MyRequests>
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       color: Colors.black87,
-                      fontSize: 12,
+                      fontSize: 10.sp,
                     ),
                   ),
                   Text(
@@ -393,7 +398,7 @@ class _MyRequestsState extends State<MyRequests>
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       color: Colors.black87,
-                      fontSize: 12,
+                      fontSize: 10.sp,
                     ),
                   ),
                   Text(
@@ -401,13 +406,13 @@ class _MyRequestsState extends State<MyRequests>
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       color: Colors.black87,
-                      fontSize: 12,
+                      fontSize: 10.sp,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 15),
+            SizedBox(width: 15.w),
           ],
         ),
       ),

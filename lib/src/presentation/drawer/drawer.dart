@@ -80,7 +80,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                 fontWeight: FontWeight.w500,
                                 color: Colors.white,
                                 letterSpacing: 1,
-                                fontSize: 15.sp, // Responsive font size
+                                fontSize: 15.sp,
                               ),
                             ),
                             SizedBox(height: 4.h),
@@ -244,33 +244,33 @@ class _CustomDrawerState extends State<CustomDrawer> {
     required VoidCallback onTap,
   }) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
+      padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
       child: InkWell(
         onTap: onTap,
         child: Container(
           height: 40.h,
           decoration: BoxDecoration(
             color: isActive ? Colors.blue[800] : Colors.white,
-            borderRadius: BorderRadius.circular(10.r),
+            borderRadius: BorderRadius.circular(8.r),
           ),
           child: Padding(
-            padding: EdgeInsets.only(left: 18.w, top: 5.h, bottom: 5.h),
+            padding: EdgeInsets.only(left: 16.w, top: 4.h, bottom: 4.h),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Icon(
                   icon,
                   color: isActive ? Colors.white : Colors.blue[900],
-                  size: 20.sp,
+                  size: 18.sp,
                 ),
-                SizedBox(width: 20.w),
+                SizedBox(width: 14.w),
                 Text(
                   title,
                   style: TextStyle(
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w700,
                     color: isActive ? Colors.white : Colors.blue[900],
                     letterSpacing: 1,
-                    fontSize: 14.sp,
+                    fontSize: 12.sp,
                   ),
                 ),
               ],

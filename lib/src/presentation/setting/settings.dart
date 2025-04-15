@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/drawer/drawer.dart';
 import 'package:mr_blue/src/presentation/setting/screens/about_us.dart';
@@ -15,7 +16,11 @@ class Setting extends StatefulWidget {
 class _SettingState extends State<Setting> {
   Color blueColor = Colors.blue.shade900;
 
-  TextStyle textStyle = TextStyle(color: Colors.blue.shade900, fontSize: 16);
+  TextStyle textStyle = TextStyle(
+    color: Colors.blue.shade900,
+    fontSize: 14.sp,
+    fontWeight: FontWeight.w900,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -44,12 +49,16 @@ class _SettingState extends State<Setting> {
                 },
                 child: ListTile(
                   title: Text("My Profile", style: textStyle),
-                  leading: Icon(Icons.person_outline, color: blueColor),
+                  leading: Icon(
+                    Icons.person_outline,
+                    color: blueColor,
+                    size: 24.sp,
+                  ),
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 7.h),
               customDivider(),
-              const SizedBox(height: 10),
+              SizedBox(height: 7.h),
               InkWell(
                 onTap: () {
                   Navigator.push(
@@ -61,12 +70,16 @@ class _SettingState extends State<Setting> {
                 },
                 child: ListTile(
                   title: Text("Add Address", style: textStyle),
-                  leading: Icon(Icons.location_on_outlined, color: blueColor),
+                  leading: Icon(
+                    Icons.location_on_outlined,
+                    color: blueColor,
+                    size: 24.sp,
+                  ),
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 7.h),
               customDivider(),
-              const SizedBox(height: 10),
+              SizedBox(height: 7.h),
               InkWell(
                 onTap: () {
                   Navigator.push(
@@ -76,32 +89,35 @@ class _SettingState extends State<Setting> {
                 },
                 child: ListTile(
                   title: Text("About us", style: textStyle),
-                  leading: Icon(Icons.article_outlined, color: blueColor),
+                  leading: Icon(
+                    Icons.article_outlined,
+                    color: blueColor,
+                    size: 24.sp,
+                  ),
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 7.h),
               customDivider(),
-              const SizedBox(height: 10),
+              SizedBox(height: 7.h),
               InkWell(
                 onTap: () {
-                  // directCall();
                   call("9555900059");
                 },
                 child: ListTile(
                   title: Text("Call us", style: textStyle),
-                  leading: Icon(Icons.call, color: blueColor),
+                  leading: Icon(Icons.call, color: blueColor, size: 24.sp),
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 7.h),
               customDivider(),
-              const SizedBox(height: 10),
+              SizedBox(height: 7.h),
               InkWell(
                 onTap: () {
                   shareApplication();
                 },
                 child: ListTile(
                   title: Text("Share", style: textStyle),
-                  leading: Icon(Icons.share, color: blueColor),
+                  leading: Icon(Icons.share, color: blueColor, size: 24.sp),
                 ),
               ),
             ],

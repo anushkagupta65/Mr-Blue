@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/home/home_screen.dart';
 import 'package:mr_blue/src/presentation/setting/settings.dart';
@@ -20,7 +21,6 @@ class _BottomnavigationState extends State<Bottomnavigation> {
         _selectedIndex = index;
       });
     } else if (index == 2) {
-      // directCall();
       call("9555900059");
     } else if (index == 3) {
       openWhatsApp();
@@ -38,16 +38,16 @@ class _BottomnavigationState extends State<Bottomnavigation> {
           fontWeight: FontWeight.w500,
           color: Colors.white,
           letterSpacing: 1,
-          fontSize: 12,
+          fontSize: 10.sp,
         ),
         unselectedLabelStyle: TextStyle(
           fontWeight: FontWeight.w500,
           color: Colors.grey,
           letterSpacing: 1,
-          fontSize: 12,
+          fontSize: 10.sp,
         ),
-        unselectedIconTheme: IconThemeData(color: Colors.white70),
-        selectedIconTheme: IconThemeData(color: Colors.white),
+        unselectedIconTheme: IconThemeData(color: Colors.white70, size: 20.sp),
+        selectedIconTheme: IconThemeData(color: Colors.white, size: 20.sp),
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(

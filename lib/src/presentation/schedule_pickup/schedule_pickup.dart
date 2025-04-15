@@ -33,7 +33,6 @@ class _BookingScreenState extends State<BookingScreen> {
   @override
   void initState() {
     super.initState();
-    // Automatically select today's date and load time slots
     WidgetsBinding.instance.addPostFrameCallback((_) {
       onDateTap(context, currentDate, setState, userId);
     });

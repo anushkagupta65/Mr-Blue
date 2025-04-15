@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/setting/screens/add_address.dart';
 
@@ -10,7 +11,6 @@ class AddAddressStatic extends StatefulWidget {
 }
 
 class _AddAddressStaticState extends State<AddAddressStatic> {
-  // Static list of addresses
   final List<Map<String, dynamic>> _addresses = [
     {
       'id': 1,
@@ -44,7 +44,6 @@ class _AddAddressStaticState extends State<AddAddressStatic> {
   @override
   void initState() {
     super.initState();
-    // Initialize address strings from static data
     _addressAll =
         _addresses.map((address) {
           final house = address['house'] ?? '';
@@ -53,7 +52,6 @@ class _AddAddressStaticState extends State<AddAddressStatic> {
           return '$house, $landmark, $mainAddress';
         }).toList();
 
-    // Set default address
     final defaultAddressIndex = _addresses.indexWhere(
       (address) => address['default'] == 1,
     );
@@ -63,7 +61,6 @@ class _AddAddressStaticState extends State<AddAddressStatic> {
 
   void _setDefaultAddress(int index) {
     setState(() {
-      // Update default status
       for (var i = 0; i < _addresses.length; i++) {
         _addresses[i]['default'] = i == index ? 1 : 0;
       }
@@ -82,7 +79,6 @@ class _AddAddressStaticState extends State<AddAddressStatic> {
             return '$house, $landmark, $mainAddress';
           }).toList();
 
-      // Reset selected index if deleted address was selected
       if (_selectedAddressIndex != null &&
           _selectedAddressIndex! >= _addresses.length) {
         _selectedAddressIndex = _addresses.isNotEmpty ? 0 : null;
@@ -109,7 +105,7 @@ class _AddAddressStaticState extends State<AddAddressStatic> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(16.0.w),
                 child: InkWell(
                   onTap: () {
                     Navigator.of(context).push(
@@ -121,22 +117,22 @@ class _AddAddressStaticState extends State<AddAddressStatic> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.blue.shade800,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12.w),
                     ),
                     width: double.infinity,
                     child: Padding(
-                      padding: const EdgeInsets.all(12.0),
+                      padding: EdgeInsets.all(12.0.w),
                       child: Row(
                         children: [
-                          const Icon(Icons.add, color: Colors.white),
-                          const SizedBox(width: 15),
+                          Icon(Icons.add, color: Colors.white, size: 24.sp),
+                          SizedBox(width: 15.w),
                           Text(
                             'Add Address',
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
                               color: Colors.white,
                               letterSpacing: 1,
-                              fontSize: 15,
+                              fontSize: 16.sp,
                             ),
                           ),
                         ],
@@ -145,23 +141,23 @@ class _AddAddressStaticState extends State<AddAddressStatic> {
                   ),
                 ),
               ),
-              const SizedBox(height: 15),
+              SizedBox(height: 12.h),
               Row(
                 children: [
-                  const Expanded(child: Divider()),
+                  Expanded(child: Divider()),
                   Text(
                     'Saved Addresses',
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
-                      color: Colors.grey.shade800,
+                      color: Colors.grey.shade900,
                       letterSpacing: 1,
-                      fontSize: 15,
+                      fontSize: 16.sp,
                     ),
                   ),
-                  const Expanded(child: Divider()),
+                  Expanded(child: Divider()),
                 ],
               ),
-              const SizedBox(height: 15),
+              SizedBox(height: 12.h),
               ListView.builder(
                 shrinkWrap: true,
                 itemCount: _addresses.length,
@@ -173,41 +169,47 @@ class _AddAddressStaticState extends State<AddAddressStatic> {
                   return GestureDetector(
                     onTap: () => _setDefaultAddress(index),
                     child: Container(
-                      margin: const EdgeInsets.all(15),
+                      margin: EdgeInsets.all(15.w),
                       decoration: BoxDecoration(
                         color: isSelected ? Colors.blue.shade800 : Colors.white,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.4),
-                            spreadRadius: 2,
-                            blurRadius: 3,
+                            color: Colors.grey.shade600.withOpacity(0.4),
+                            spreadRadius: 2.w,
+                            blurRadius: 3.w,
                           ),
                         ],
-                        borderRadius: BorderRadius.circular(19.0),
+                        borderRadius: BorderRadius.circular(19.0.w),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.all(15),
+                        padding: EdgeInsets.all(15.w),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Icon(
                               Icons.home,
-                              color: isSelected ? Colors.white : Colors.grey,
+                              color:
+                                  isSelected
+                                      ? Colors.white
+                                      : Colors.grey.shade600,
+                              size: 24.sp,
                             ),
-                            const SizedBox(width: 10),
+                            SizedBox(width: 10.w),
                             Expanded(
                               child: Text(
                                 _addressAll[index],
                                 style: TextStyle(
                                   fontWeight: FontWeight.w500,
                                   color:
-                                      isSelected ? Colors.white : Colors.grey,
+                                      isSelected
+                                          ? Colors.white
+                                          : Colors.grey.shade600,
                                   letterSpacing: 1,
-                                  fontSize: 15,
+                                  fontSize: 12.sp,
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 20),
+                            SizedBox(width: 20.w),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
@@ -221,9 +223,9 @@ class _AddAddressStaticState extends State<AddAddressStatic> {
                                           color:
                                               isSelected
                                                   ? Colors.white
-                                                  : Colors.grey,
+                                                  : Colors.grey.shade600,
                                           letterSpacing: 1,
-                                          fontSize: 15,
+                                          fontSize: 12.sp,
                                         ),
                                       ),
                                       onTap: () {
@@ -231,11 +233,17 @@ class _AddAddressStaticState extends State<AddAddressStatic> {
                                           context: context,
                                           builder: (context) {
                                             return AlertDialog(
-                                              title: const Text(
+                                              title: Text(
                                                 'Delete Address',
+                                                style: TextStyle(
+                                                  fontSize: 14.sp,
+                                                ),
                                               ),
-                                              content: const Text(
+                                              content: Text(
                                                 'Are you sure you want to delete this address?',
+                                                style: TextStyle(
+                                                  fontSize: 12.sp,
+                                                ),
                                               ),
                                               actions: [
                                                 TextButton(
@@ -248,6 +256,7 @@ class _AddAddressStaticState extends State<AddAddressStatic> {
                                                     style: TextStyle(
                                                       color:
                                                           Colors.blue.shade700,
+                                                      fontSize: 12.sp,
                                                     ),
                                                   ),
                                                 ),
@@ -261,6 +270,7 @@ class _AddAddressStaticState extends State<AddAddressStatic> {
                                                     style: TextStyle(
                                                       color:
                                                           Colors.blue.shade700,
+                                                      fontSize: 12.sp,
                                                     ),
                                                   ),
                                                 ),
@@ -270,7 +280,7 @@ class _AddAddressStaticState extends State<AddAddressStatic> {
                                         );
                                       },
                                     ),
-                                    const SizedBox(width: 10),
+                                    SizedBox(width: 10.w),
                                     InkWell(
                                       child: Text(
                                         'Edit',
@@ -279,24 +289,27 @@ class _AddAddressStaticState extends State<AddAddressStatic> {
                                           color:
                                               isSelected
                                                   ? Colors.white
-                                                  : Colors.grey,
+                                                  : Colors.grey.shade600,
                                           letterSpacing: 1,
-                                          fontSize: 15,
+                                          fontSize: 12.sp,
                                         ),
                                       ),
-                                      onTap: () {
-                                        // Navigate to edit address screen
-                                      },
+                                      onTap: () {},
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 10),
+                                SizedBox(height: 10.h),
                                 isSelected
-                                    ? const Icon(
+                                    ? Icon(
                                       Icons.check,
                                       color: Colors.white,
+                                      size: 16.sp,
                                     )
-                                    : const Icon(Icons.add, color: Colors.grey),
+                                    : Icon(
+                                      Icons.add,
+                                      color: Colors.grey.shade600,
+                                      size: 16.sp,
+                                    ),
                               ],
                             ),
                           ],

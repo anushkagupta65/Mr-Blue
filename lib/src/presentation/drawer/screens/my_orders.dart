@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/drawer/widgets/custom_widgets.dart';
 
@@ -42,7 +42,7 @@ class _MyOrdersState extends State<MyOrders>
                 labelColor: Colors.white,
                 labelStyle: TextStyle(
                   fontWeight: FontWeight.w600,
-                  fontSize: 14,
+                  fontSize: 14.sp,
                 ),
                 unselectedLabelColor: Colors.black,
                 indicatorPadding: EdgeInsets.all(6),
@@ -135,40 +135,38 @@ class _MyOrdersState extends State<MyOrders>
                         Divider(color: Colors.blue[900], thickness: 1),
                         Expanded(
                           child: ListView.builder(
-                            itemCount: 3, // Sample data
+                            itemCount: 3,
                             itemBuilder: (BuildContext context, index) {
                               return Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 12,
-                                  right: 12,
-                                  top: 8,
+                                padding: EdgeInsets.only(
+                                  left: 12.w,
+                                  right: 12.w,
+                                  top: 12.h,
                                 ),
                                 child: InkWell(
-                                  onTap: () {
-                                    // Navigate to order details
-                                  },
+                                  onTap: () {},
                                   child: Container(
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       border: Border.all(color: Colors.blue),
-                                      borderRadius: BorderRadius.circular(15),
+                                      borderRadius: BorderRadius.circular(12.w),
                                     ),
                                     child: Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
                                         Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 15,
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 14.w,
                                           ),
                                           child: Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Padding(
-                                                padding: const EdgeInsets.only(
-                                                  top: 10,
-                                                  bottom: 5,
+                                                padding: EdgeInsets.only(
+                                                  top: 10.h,
+                                                  bottom: 5.h,
                                                 ),
                                                 child: Column(
                                                   crossAxisAlignment:
@@ -176,52 +174,54 @@ class _MyOrdersState extends State<MyOrders>
                                                   children: [
                                                     Text(
                                                       'Dryclean',
-                                                      style:
-                                                          GoogleFonts.poppins(
-                                                            fontWeight:
-                                                                FontWeight.w700,
-                                                            color:
-                                                                Colors.blueGrey,
-                                                            fontSize: 16,
-                                                          ),
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w800,
+                                                        color: Colors.blueGrey,
+                                                        fontSize: 14.sp,
+                                                      ),
                                                     ),
                                                     Text(
                                                       'Amount: Rs. 500',
-                                                      style:
-                                                          GoogleFonts.poppins(
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                            color: Colors.black,
-                                                            fontSize: 13,
-                                                          ),
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Colors.black,
+                                                        fontSize: 10.sp,
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.end,
-                                                children: [
-                                                  Text(
-                                                    '#ORD123',
-                                                    style: GoogleFonts.poppins(
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Colors.black,
-                                                      fontSize: 13,
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                  top: 10.h,
+                                                  bottom: 5.h,
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      '#ORD123',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Colors.black,
+                                                        fontSize: 10.sp,
+                                                      ),
                                                     ),
-                                                  ),
-                                                  SizedBox(height: 5),
-                                                  Text(
-                                                    'Quantity: 2',
-                                                    style: GoogleFonts.poppins(
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Colors.black,
-                                                      fontSize: 13,
+                                                    Text(
+                                                      'Quantity 1',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Colors.black,
+                                                        fontSize: 10.sp,
+                                                      ),
                                                     ),
-                                                  ),
-                                                ],
+                                                  ],
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -231,8 +231,8 @@ class _MyOrdersState extends State<MyOrders>
                                               MainAxisAlignment.spaceEvenly,
                                           children: [
                                             SizedBox(
-                                              height: 35,
-                                              width: 80,
+                                              height: 28.h,
+                                              width: 64.w,
                                               child: DecoratedBox(
                                                 decoration: BoxDecoration(
                                                   color: Colors.blue,
@@ -240,24 +240,26 @@ class _MyOrdersState extends State<MyOrders>
                                                     color: Colors.white,
                                                   ),
                                                   borderRadius:
-                                                      BorderRadius.circular(12),
+                                                      BorderRadius.circular(
+                                                        12.w,
+                                                      ),
                                                 ),
                                                 child: Center(
                                                   child: Text(
                                                     'Track',
-                                                    style: GoogleFonts.poppins(
+                                                    style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.w600,
                                                       color: Colors.white,
-                                                      fontSize: 13,
+                                                      fontSize: 10.sp,
                                                     ),
                                                   ),
                                                 ),
                                               ),
                                             ),
                                             SizedBox(
-                                              height: 35,
-                                              width: 80,
+                                              height: 28.h,
+                                              width: 64.w,
                                               child: DecoratedBox(
                                                 decoration: BoxDecoration(
                                                   color: Colors.blue,
@@ -265,24 +267,26 @@ class _MyOrdersState extends State<MyOrders>
                                                     color: Colors.white,
                                                   ),
                                                   borderRadius:
-                                                      BorderRadius.circular(12),
+                                                      BorderRadius.circular(
+                                                        12.w,
+                                                      ),
                                                 ),
                                                 child: Center(
                                                   child: Text(
                                                     'Pay',
-                                                    style: GoogleFonts.poppins(
+                                                    style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.w600,
                                                       color: Colors.white,
-                                                      fontSize: 13,
+                                                      fontSize: 10.sp,
                                                     ),
                                                   ),
                                                 ),
                                               ),
                                             ),
                                             SizedBox(
-                                              height: 35,
-                                              width: 80,
+                                              height: 28.h,
+                                              width: 64.w,
                                               child: DecoratedBox(
                                                 decoration: BoxDecoration(
                                                   color: Colors.blue,
@@ -290,16 +294,18 @@ class _MyOrdersState extends State<MyOrders>
                                                     color: Colors.white,
                                                   ),
                                                   borderRadius:
-                                                      BorderRadius.circular(12),
+                                                      BorderRadius.circular(
+                                                        12.w,
+                                                      ),
                                                 ),
                                                 child: Center(
                                                   child: Text(
                                                     'View',
-                                                    style: GoogleFonts.poppins(
+                                                    style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.w600,
                                                       color: Colors.white,
-                                                      fontSize: 13,
+                                                      fontSize: 10.sp,
                                                     ),
                                                   ),
                                                 ),
@@ -307,7 +313,7 @@ class _MyOrdersState extends State<MyOrders>
                                             ),
                                           ],
                                         ),
-                                        SizedBox(height: 10),
+                                        SizedBox(height: 10.h),
                                       ],
                                     ),
                                   ),
@@ -316,39 +322,37 @@ class _MyOrdersState extends State<MyOrders>
                             },
                           ),
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 20.h),
                       ],
                     ),
                     ListView.builder(
-                      itemCount: 2, // Sample data
+                      itemCount: 2,
                       itemBuilder: (BuildContext context, index) {
                         return Padding(
-                          padding: const EdgeInsets.only(
-                            left: 12,
-                            right: 12,
-                            top: 8,
+                          padding: EdgeInsets.only(
+                            left: 12.w,
+                            right: 12.w,
+                            top: 12.h,
                           ),
                           child: InkWell(
-                            onTap: () {
-                              // Navigate to order details
-                            },
+                            onTap: () {},
                             child: Container(
                               width: double.infinity,
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 border: Border.all(color: Colors.blue),
-                                borderRadius: BorderRadius.circular(15),
+                                borderRadius: BorderRadius.circular(12.w),
                               ),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.only(
-                                      top: 5,
-                                      bottom: 5,
-                                      left: 15,
-                                      right: 15,
+                                    padding: EdgeInsets.only(
+                                      top: 5.h,
+                                      bottom: 5.h,
+                                      left: 12.w,
+                                      right: 12.w,
                                     ),
                                     child: Column(
                                       crossAxisAlignment:
@@ -360,18 +364,18 @@ class _MyOrdersState extends State<MyOrders>
                                           children: [
                                             Text(
                                               'Dryclean',
-                                              style: GoogleFonts.poppins(
-                                                fontWeight: FontWeight.w700,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w800,
                                                 color: Colors.blueGrey,
-                                                fontSize: 16,
+                                                fontSize: 14.sp,
                                               ),
                                             ),
                                             Text(
                                               '#ORD124',
-                                              style: GoogleFonts.poppins(
+                                              style: TextStyle(
                                                 fontWeight: FontWeight.w500,
                                                 color: Colors.black,
-                                                fontSize: 13,
+                                                fontSize: 10.sp,
                                               ),
                                             ),
                                           ],
@@ -382,30 +386,35 @@ class _MyOrdersState extends State<MyOrders>
                                           children: [
                                             Text(
                                               'Quantity: 1',
-                                              style: GoogleFonts.poppins(
+                                              style: TextStyle(
                                                 fontWeight: FontWeight.w500,
                                                 color: Colors.black,
-                                                fontSize: 13,
+                                                fontSize: 10.sp,
                                               ),
                                             ),
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                color: Colors.blue,
-                                                borderRadius:
-                                                    BorderRadius.circular(5),
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 15,
-                                                      vertical: 5,
+                                            Padding(
+                                              padding: EdgeInsets.all(4.sp),
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: Colors.blue,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        12.w,
+                                                      ),
+                                                ),
+                                                child: Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: 14.w,
+                                                    vertical: 6.h,
+                                                  ),
+                                                  child: Text(
+                                                    'View',
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Colors.white,
+                                                      fontSize: 10.sp,
                                                     ),
-                                                child: Text(
-                                                  'View',
-                                                  style: GoogleFonts.poppins(
-                                                    fontWeight: FontWeight.w600,
-                                                    color: Colors.white,
-                                                    fontSize: 13,
                                                   ),
                                                 ),
                                               ),

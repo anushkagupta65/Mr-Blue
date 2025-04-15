@@ -16,17 +16,14 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final ApiService _apiService = ApiService();
   List<Map<String, dynamic>> _services = [];
-  List<Map<String, dynamic>> _filteredServices =
-      []; // List for filtered results
+  List<Map<String, dynamic>> _filteredServices = [];
   bool _isLoading = true;
-  final TextEditingController _searchController =
-      TextEditingController(); // Controller for TextField
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _fetchServices();
-    // Add listener to filter services on text change
     _searchController.addListener(_onSearchTextChanged);
   }
 
@@ -46,8 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 )
                 .toList();
-        _filteredServices =
-            _services; // Initialize filtered list with all services
+        _filteredServices = _services;
         _isLoading = false;
       });
     } catch (e) {
@@ -59,12 +55,11 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Filter services based on search query
   void _onSearchTextChanged() {
     String query = _searchController.text.trim().toLowerCase();
     setState(() {
       if (query.isEmpty) {
-        _filteredServices = _services; // Show all services if query is empty
+        _filteredServices = _services;
       } else {
         _filteredServices =
             _services
@@ -130,9 +125,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     SizedBox(height: 10.h),
                                     TextField(
-                                      controller:
-                                          _searchController, // Attach controller
+                                      controller: _searchController,
                                       decoration: InputDecoration(
+                                        labelStyle: TextStyle(fontSize: 10.sp),
                                         hintStyle: TextStyle(fontSize: 10.sp),
                                         hintText:
                                             'Search for a laundry service',

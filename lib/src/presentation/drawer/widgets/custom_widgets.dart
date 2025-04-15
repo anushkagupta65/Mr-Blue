@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class FilterButton extends StatelessWidget {
   final String label;
@@ -29,17 +30,17 @@ class FilterButton extends StatelessWidget {
                   : Colors.blue[100]!.withOpacity(0.5),
         ),
         width: MediaQuery.of(context).size.width * 0.4,
-        padding: const EdgeInsets.all(8),
+        padding: EdgeInsets.all(8.sp),
         child: Row(
           children: [
-            Icon(icon, color: Colors.blue),
-            const SizedBox(width: 10),
+            Icon(icon, color: Colors.blue, size: 20.sp),
+            SizedBox(width: 10.w),
             Text(
               label,
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: Colors.black,
-                fontSize: 14,
+                fontSize: 12.sp,
               ),
             ),
           ],

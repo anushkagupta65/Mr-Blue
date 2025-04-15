@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/schedule_pickup/screens/booking_confirmation.dart';
 import 'package:mr_blue/src/services/api_services.dart';
@@ -74,7 +73,6 @@ class _AddressScreenState extends State<AddressScreen> {
         _isSubmitting = true;
       });
 
-      // Find the city ID for the selected city
       String? cityId;
       for (var city in _cities) {
         if (city['name'] == _selectedCity) {
@@ -156,8 +154,8 @@ class _AddressScreenState extends State<AddressScreen> {
         maxLength: maxLength,
         decoration: InputDecoration(
           hintText: hint ?? 'Enter your $label',
-          labelStyle: GoogleFonts.poppins(color: Colors.black),
-          hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+          labelStyle: TextStyle(color: Colors.black),
+          hintStyle: TextStyle(color: Colors.grey[400]),
           prefixIcon: icon != null ? Icon(icon, color: Colors.black) : null,
           suffixIcon:
               suffixIcon != null ? Icon(suffixIcon, color: Colors.grey) : null,
@@ -195,8 +193,8 @@ class _AddressScreenState extends State<AddressScreen> {
       child: DropdownButtonFormField<String>(
         value: _selectedCity,
         decoration: InputDecoration(
-          labelStyle: GoogleFonts.poppins(color: Colors.black),
-          hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+          labelStyle: TextStyle(color: Colors.black),
+          hintStyle: TextStyle(color: Colors.grey[400]),
           prefixIcon: const Icon(
             Icons.location_city_outlined,
             color: Colors.black,
@@ -220,7 +218,7 @@ class _AddressScreenState extends State<AddressScreen> {
             _cities.map((city) {
               return DropdownMenuItem<String>(
                 value: city['name'],
-                child: Text(city['name']!, style: GoogleFonts.poppins()),
+                child: Text(city['name']!, style: TextStyle()),
               );
             }).toList(),
         onChanged: (value) {
@@ -243,7 +241,7 @@ class _AddressScreenState extends State<AddressScreen> {
                 )
                 : Text(
                   'Select a city',
-                  style: GoogleFonts.poppins(color: Colors.grey[400]),
+                  style: TextStyle(color: Colors.grey[400]),
                 ),
         isExpanded: true,
       ),
@@ -277,7 +275,7 @@ class _AddressScreenState extends State<AddressScreen> {
                     children: [
                       Text(
                         'Delivery Address',
-                        style: GoogleFonts.poppins(
+                        style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.blueGrey[900],
@@ -286,10 +284,7 @@ class _AddressScreenState extends State<AddressScreen> {
                       const SizedBox(height: 8),
                       Text(
                         'Please fill in the details below to add a new address.',
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                       const SizedBox(height: 24),
                       Card(
@@ -363,7 +358,7 @@ class _AddressScreenState extends State<AddressScreen> {
                       ),
                       label: Text(
                         _isSubmitting ? 'Adding...' : 'Add Address',
-                        style: GoogleFonts.poppins(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
