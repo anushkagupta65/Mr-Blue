@@ -30,7 +30,7 @@ class FilterButton extends StatelessWidget {
                   : Colors.blue[100]!.withOpacity(0.5),
         ),
         width: MediaQuery.of(context).size.width * 0.4,
-        padding: EdgeInsets.all(8.sp),
+        padding: EdgeInsets.all(8.r),
         child: Row(
           children: [
             Icon(icon, color: Colors.blue, size: 20.sp),

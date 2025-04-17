@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
+import 'package:mr_blue/src/presentation/drawer/screens/contact_us.dart';
 import 'package:mr_blue/src/presentation/drawer/screens/logout.dart';
 import 'package:mr_blue/src/presentation/drawer/screens/my_orders.dart';
 import 'package:mr_blue/src/presentation/drawer/screens/my_requests.dart';
@@ -170,22 +171,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
             customDivider(),
             _buildMenuItem(
-              icon: Icons.currency_rupee_outlined,
-              title: 'Pay Now',
-              index: 5,
-              isActive: _activeDrawerIndex == 5,
-              onTap: () {
-                setState(() {
-                  _activeDrawerIndex = 5;
-                });
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => PayNow()),
-                // );
-              },
-            ),
-            customDivider(),
-            _buildMenuItem(
               icon: Icons.price_change_outlined,
               title: 'Price List',
               index: 6,
@@ -210,10 +195,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 setState(() {
                   _activeDrawerIndex = 7;
                 });
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => const ContactUs()),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ContactUs()),
+                );
               },
             ),
             customDivider(),

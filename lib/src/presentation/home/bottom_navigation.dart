@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
@@ -22,11 +24,31 @@ class _BottomnavigationState extends State<Bottomnavigation> {
   void initState() {
     super.initState();
     _fetchLocationAndPost();
+    _fetchAddress();
+  }
+
+  Future<void> _fetchAddress() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      String? userID = prefs.getString('user_id');
+
+      if (userID != null) {
+        String response = await _apiService.availableAddress(userID);
+        print('API Response _fetchAddress: $response');
+        final responseBody = json.decode(response);
+        final addressID = responseBody['Address']['id'].toString();
+        await prefs.setString('user_address_id', addressID);
+      } else {
+        print('User id not found in SharedPreferences');
+      }
+    } catch (e) {
+      print('DEBUG: Error occurred: $e');
+    }
   }
 
   Future<void> _fetchLocationAndPost() async {
     try {
-      print('DEBUG: Starting to fetch location from SharedPreferences');
       SharedPreferences prefs = await SharedPreferences.getInstance();
 
       String? latitude = prefs.getDouble('latitude').toString();
@@ -34,15 +56,22 @@ class _BottomnavigationState extends State<Bottomnavigation> {
 
       print('DEBUG: Latitude: $latitude, Longitude: $longitude');
 
-      if (latitude != null && longitude != null) {
-        print('DEBUG: Calling postUserLocation API');
-        String response = await _apiService.postUserLocation(
-          latitude,
-          longitude,
+      String response = await _apiService.postUserLocation();
+      final responseBody = jsonDecode(response);
+
+      print('DEBUG: API Response: $responseBody');
+
+      if (responseBody['Status'] == "Success") {
+        await prefs.setString(
+          'region_id',
+          responseBody['region_id'].toString(),
         );
-        print('DEBUG: API Response: $response');
+        await prefs.setString('city_id', responseBody['city_id'].toString());
+        await prefs.setString('store_id', responseBody['store_id'].toString());
       } else {
-        print('DEBUG: Latitude or Longitude not found in SharedPreferences');
+        await prefs.setString('region_id', "5");
+        await prefs.setString('city_id', "2");
+        await prefs.setString('store_id', "39");
       }
     } catch (e) {
       print('DEBUG: Error occurred: $e');

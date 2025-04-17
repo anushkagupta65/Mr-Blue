@@ -8,6 +8,7 @@ class ApiService {
     return {'Accept': 'application/json'};
   }
 
+  // ========================================================================== POST ======================================================
   // =================================================================== TO REGISTER NEW USER =============================================
   /// Registers a new user with the provided mobile number.
   Future<String> registerNewUser(String mobile) async {
@@ -35,6 +36,7 @@ class ApiService {
     }
   }
 
+  // ======================================================================== POST ======================================================
   // =================================================================== TO VERIFY OTP ===================================================
   /// Verifies the OTP for a user.
   Future<String> verifyOtp(String userId, String otp) async {
@@ -140,6 +142,29 @@ class ApiService {
     }
   }
 
+  Future<String> availableAddress(String userID) async {
+    try {
+      var request = http.Request(
+        'GET',
+        Uri.parse('$_baseUrl/new-user-get-address/$userID'),
+      );
+      request.headers.addAll(_getHeaders());
+
+      http.StreamedResponse response = await request.send();
+
+      String responseBody = await response.stream.bytesToString();
+      if (response.statusCode == 200) {
+        return responseBody;
+      } else {
+        throw Exception(
+          'Failed: ${response.statusCode} - ${response.reasonPhrase}',
+        );
+      }
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
   // ================================================================= TO GET CITIES ===================================================
   /// Fetches the list of cities available for a user.
   Future<String> fetchCities() async {
@@ -203,14 +228,22 @@ class ApiService {
 
   // ================================================================ TO POST USER'S LOCATION ===================================================
   /// Posts the user's location with latitude and longitude.
-  Future<String> postUserLocation(String latitude, String longitude) async {
+  Future<String> postUserLocation(
+    // String latitude,
+    // String longitude,
+  ) async {
     try {
       var request = http.MultipartRequest(
         'POST',
         Uri.parse('$_baseUrl/new-user-time-slot'),
       );
 
-      request.fields.addAll({'latitude': latitude, 'longitude': longitude});
+      request.fields.addAll({
+        // 'latitude': latitude,
+        // 'longitude': longitude,
+        'latitude': '28.536165745526322',
+        'longitude': '77.14089179999999',
+      });
       request.headers.addAll(_getHeaders());
 
       http.StreamedResponse response = await request.send();
@@ -263,6 +296,85 @@ class ApiService {
         Uri.parse('$_baseUrl/pricelists/$regionId'),
       );
 
+      request.headers.addAll(_getHeaders());
+
+      http.StreamedResponse response = await request.send();
+
+      String responseBody = await response.stream.bytesToString();
+      if (response.statusCode == 200) {
+        return responseBody;
+      } else {
+        throw Exception(
+          'Failed: ${response.statusCode} - ${response.reasonPhrase}',
+        );
+      }
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  //
+  Future<String> updateUserAddress({
+    required String userId,
+    required String cityId,
+    required String zip,
+    required String address,
+  }) async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$_baseUrl/new-user-update-address'),
+      );
+
+      request.headers.addAll(_getHeaders());
+
+      request.fields.addAll({
+        'user_id': userId,
+        'city_id': cityId,
+        'zip': zip,
+        'address': address,
+      });
+
+      http.StreamedResponse response = await request.send();
+
+      String responseBody = await response.stream.bytesToString();
+      if (response.statusCode == 200) {
+        return responseBody;
+      } else {
+        throw Exception(
+          'Failed: ${response.statusCode} - ${response.reasonPhrase}',
+        );
+      }
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  Future<String> bookOrder(
+    String userId,
+    String addressId,
+    String picdate,
+    String dropdate,
+    String timeSlotId,
+    String storeId,
+    String sameOrNextDay,
+  ) async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$_baseUrl/confirm-new-booking'),
+      );
+
+      request.fields.addAll({
+        'user_id': userId,
+        'address_id': addressId,
+        'picdate': picdate,
+        'dropdate': dropdate,
+        'timeslot_id': timeSlotId,
+        'timeslot2_id': timeSlotId,
+        'store_id': storeId,
+        'same_or_next_day': sameOrNextDay,
+      });
       request.headers.addAll(_getHeaders());
 
       http.StreamedResponse response = await request.send();

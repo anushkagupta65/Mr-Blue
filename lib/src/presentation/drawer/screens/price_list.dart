@@ -167,7 +167,7 @@ class _PriceListState extends State<PriceList>
                           fontSize: 14.sp,
                         ),
                         unselectedLabelColor: Colors.black,
-                        indicatorPadding: EdgeInsets.all(6.w),
+                        indicatorPadding: EdgeInsets.all(6.r),
                         dividerColor: Colors.blue[900],
                         indicatorSize: TabBarIndicatorSize.tab,
                         indicator: BoxDecoration(
@@ -291,7 +291,7 @@ class _PriceListState extends State<PriceList>
                                                 ),
                                               ),
                                               child: Padding(
-                                                padding: EdgeInsets.all(12.w),
+                                                padding: EdgeInsets.all(12.r),
                                                 child: Row(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment

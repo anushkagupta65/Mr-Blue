@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/schedule_pickup/screens/order_summary.dart';
+import 'package:mr_blue/src/services/api_services.dart';
 
 class BookingScreen extends StatefulWidget {
   const BookingScreen({super.key});
@@ -14,6 +14,7 @@ class BookingScreen extends StatefulWidget {
 }
 
 class _BookingScreenState extends State<BookingScreen> {
+  final ApiService apiService = ApiService();
   DateTime? selectedDate;
   String finalDate = '';
   String finalHour = '';
@@ -24,67 +25,98 @@ class _BookingScreenState extends State<BookingScreen> {
   List<Map<String, dynamic>> availableTimes = [];
   int? timeid;
   int selectedValue = 1;
-  int expressService = 1;
+  String? sameOrNextDay;
   List<dynamic> addresses = [];
   bool isLoading = false;
-  String userId = '123';
   final DateTime currentDate = DateTime.now();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      onDateTap(context, currentDate, setState, userId);
+      onDateTap(context, currentDate);
     });
   }
 
   Future<void> fetchTime() async {
-    bool isToday =
-        selectedDate != null &&
-        selectedDate!.year == currentDate.year &&
-        selectedDate!.month == currentDate.month &&
-        selectedDate!.day == currentDate.day;
-    finalHour =
-        isToday
-            ? DateFormat('HH').format(DateTime.now().add(Duration(hours: 2)))
-            : '06';
+    try {
+      bool isToday =
+          selectedDate != null &&
+          selectedDate!.year == DateTime.now().year &&
+          selectedDate!.month == DateTime.now().month &&
+          selectedDate!.day == DateTime.now().day;
 
-    if (finalDate.isNotEmpty && finalHour.isNotEmpty) {
-      final response = await http.get(
-        Uri.parse(
-          'https://fabspin.org/api/check-available-time/$finalDate/$finalHour/pick',
-        ),
-      );
+      final currentHour = DateTime.now().hour;
+      final currentMinute = DateTime.now().minute;
 
-      if (response.statusCode == 200) {
-        setState(() {
-          availableTimes = List<Map<String, dynamic>>.from(
-            json.decode(response.body),
-          );
-        });
-      } else {
-        throw Exception('Failed to load data');
+      finalHour =
+          isToday
+              ? DateFormat('HH').format(DateTime.now().add(Duration(hours: 2)))
+              : '06';
+
+      if (finalDate.isNotEmpty && finalHour.isNotEmpty) {
+        final response = await apiService.checkAvailableTime(finalDate);
+        final responseBody = json.decode(response);
+
+        if (responseBody != null && responseBody is List) {
+          List<Map<String, dynamic>> filteredTimes =
+              List<Map<String, dynamic>>.from(responseBody).where((slot) {
+                if (!isToday) {
+                  return true;
+                }
+
+                int startTime = slot['start_time'];
+                return startTime > currentHour ||
+                    (startTime == currentHour && currentMinute < 30);
+              }).toList();
+
+          setState(() {
+            availableTimes = filteredTimes;
+          });
+        } else {
+          throw Exception('Invalid response format');
+        }
       }
+    } catch (e) {
+      print('Error fetching time slots: $e');
+      setState(() {
+        availableTimes = [];
+      });
     }
   }
 
-  DateTime? getSelectedDateTime() {
-    if (selectedDate != null && timeid != null) {
-      final selectedTime = availableTimes.firstWhere(
-        (time) => time['id'] == timeid,
-        orElse: () => {},
+  String? getSelectedDateTime() {
+    if (selectedDate != null) {
+      final dateTime = DateTime(
+        selectedDate!.year,
+        selectedDate!.month,
+        selectedDate!.day,
       );
-      if (selectedTime.isNotEmpty) {
-        int startHour = selectedTime['start_time'];
-        return DateTime(
-          selectedDate!.year,
-          selectedDate!.month,
-          selectedDate!.day,
-          startHour,
-        );
-      }
+      return DateFormat('yyyy-MM-dd').format(dateTime);
     }
     return null;
+  }
+
+  void onDateTap(BuildContext context, DateTime date) async {
+    setState(() {
+      selectedDate = date;
+      finalDate = DateFormat('yyyy-MM-dd').format(date);
+      availableTimes.clear();
+      isLoading = true;
+      timeid = null;
+    });
+    try {
+      await fetchTime();
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      print("Error fetching times: $e");
+      setState(() {
+        isLoading = false;
+      });
+      showToastMessage('Failed to load time slots');
+    }
   }
 
   @override
@@ -136,7 +168,7 @@ class _BookingScreenState extends State<BookingScreen> {
 
                       return GestureDetector(
                         onTap: () {
-                          onDateTap(context, date, setState, userId);
+                          onDateTap(context, date);
                         },
                         child: Container(
                           width: 60.w,
@@ -286,7 +318,7 @@ class _BookingScreenState extends State<BookingScreen> {
                           if (selected) {
                             setState(() {
                               selectedValue = 0;
-                              expressService = 1;
+                              sameOrNextDay = "1";
                             });
                           }
                         },
@@ -319,11 +351,12 @@ class _BookingScreenState extends State<BookingScreen> {
                           vertical: 4.h,
                         ),
                         onSelected: (selected) {
-                          if (selected)
+                          if (selected) {
                             setState(() {
                               selectedValue = 1;
-                              expressService = 0;
+                              sameOrNextDay = null;
                             });
+                          }
                         },
                       ),
                     ),
@@ -334,16 +367,28 @@ class _BookingScreenState extends State<BookingScreen> {
                 padding: EdgeInsets.all(12.r),
                 child: ElevatedButton(
                   onPressed: () {
-                    DateTime? pickupDateTime = getSelectedDateTime();
-                    if (pickupDateTime != null) {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder:
-                              (context) => OrderSummaryScreen(
-                                pickupDateTime: pickupDateTime,
-                              ),
-                        ),
+                    String? pickupDate = getSelectedDateTime();
+                    if (pickupDate != null && timeid != null) {
+                      final selectedTime = availableTimes.firstWhere(
+                        (time) => time['id'] == timeid,
+                        orElse: () => {},
                       );
+                      if (selectedTime.isNotEmpty) {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder:
+                                (context) => OrderSummaryScreen(
+                                  sameOrNextDay: sameOrNextDay.toString(),
+                                  picdate: pickupDate,
+                                  timeSlot:
+                                      selectedTime['combine_time'].toString(),
+                                  timeSlotId: selectedTime['id'].toString(),
+                                ),
+                          ),
+                        );
+                      } else {
+                        showToastMessage('Please select a valid time slot');
+                      }
                     } else {
                       showToastMessage('Please select a date and time slot');
                     }
@@ -371,32 +416,5 @@ class _BookingScreenState extends State<BookingScreen> {
         ),
       ),
     );
-  }
-
-  void onDateTap(
-    BuildContext context,
-    DateTime date,
-    Function setState,
-    String userId,
-  ) async {
-    setState(() {
-      selectedDate = date;
-      finalDate = DateFormat('yyyy-MM-dd').format(date);
-      availableTimes.clear();
-      isLoading = true;
-      timeid = null; // Reset time selection when date changes
-    });
-    try {
-      await fetchTime();
-      setState(() {
-        isLoading = false;
-      });
-    } catch (e) {
-      print("Error fetching times: $e");
-      setState(() {
-        isLoading = false;
-      });
-      showToastMessage('Failed to load time slots');
-    }
   }
 }

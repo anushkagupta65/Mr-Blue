@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -13,15 +12,12 @@ Widget customDivider() {
 dynamic customAppBar(String title) {
   return AppBar(
     backgroundColor: Colors.blue.shade700,
-    title: Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: Text(
-        title,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 22.h,
-          fontWeight: FontWeight.w900,
-        ),
+    title: Text(
+      title,
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 22.h,
+        fontWeight: FontWeight.w900,
       ),
     ),
     centerTitle: true,
@@ -60,10 +56,6 @@ Future<void> call(String phoneNumber) async {
   } else {
     print('Phone permission denied');
   }
-}
-
-Future<void> directCall() async {
-  await FlutterPhoneDirectCaller.callNumber('+919555900059');
 }
 
 void shareApplication() {

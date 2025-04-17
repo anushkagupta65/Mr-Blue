@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/drawer/drawer.dart';
+import 'package:mr_blue/src/presentation/home/map_screen.dart';
 import 'package:mr_blue/src/presentation/setting/screens/about_us.dart';
-import 'package:mr_blue/src/presentation/setting/screens/addresses.dart';
 import 'package:mr_blue/src/presentation/setting/screens/profile.dart';
 
 class Setting extends StatefulWidget {
@@ -63,13 +63,11 @@ class _SettingState extends State<Setting> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const AddAddressStatic(),
-                    ),
+                    MaterialPageRoute(builder: (context) => MapScreen()),
                   );
                 },
                 child: ListTile(
-                  title: Text("Add Address", style: textStyle),
+                  title: Text("Address", style: textStyle),
                   leading: Icon(
                     Icons.location_on_outlined,
                     color: blueColor,

@@ -33,22 +33,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadSavedAddress() async {
     final prefs = await SharedPreferences.getInstance();
-    final addressId = prefs.getInt('selected_address_id');
-    if (addressId != null) {
-      final house = prefs.getString('selected_address_house') ?? '';
-      final landmark = prefs.getString('selected_address_landmark') ?? '';
-      final address = prefs.getString('selected_address_address') ?? '';
-      setState(() {
-        _displayAddress =
-            house.isNotEmpty
-                ? '$house, $landmark, $address'
-                : '$landmark, $address';
-      });
-    } else {
-      setState(() {
-        _displayAddress = "Add Location";
-      });
-    }
+    final savedAddress = prefs.getString('user_address');
+    setState(() {
+      _displayAddress =
+          savedAddress != null && savedAddress.isNotEmpty
+              ? savedAddress
+              : "Please add location..";
+    });
   }
 
   Future<void> _fetchServices() async {
@@ -380,7 +371,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       TextSpan(
                                         text: 'Picks up, Cleans ',
                                         style: TextStyle(
-                                          fontSize: 22.sp,
+                                          height: 2,
+                                          fontSize: 24.sp,
                                           fontWeight: FontWeight.w700,
                                           color: Colors.blue.shade800,
                                         ),
@@ -388,7 +380,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       TextSpan(
                                         text: 'and ',
                                         style: TextStyle(
-                                          fontSize: 12.sp,
+                                          height: 2,
+                                          fontSize: 14.sp,
                                           fontWeight: FontWeight.w700,
                                           color: Colors.black,
                                         ),
@@ -396,7 +389,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       TextSpan(
                                         text: 'Delivers ',
                                         style: TextStyle(
-                                          fontSize: 22.sp,
+                                          fontSize: 24.sp,
+                                          height: 2,
                                           fontWeight: FontWeight.w700,
                                           color: Colors.blue.shade800,
                                         ),
@@ -405,7 +399,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         text:
                                             'your laundry right to your doorstep!',
                                         style: TextStyle(
-                                          fontSize: 12.sp,
+                                          fontSize: 14.sp,
+                                          height: 2,
                                           fontWeight: FontWeight.w700,
                                           color: Colors.black,
                                         ),

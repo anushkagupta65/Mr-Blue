@@ -45,7 +45,7 @@ class _MyOrdersState extends State<MyOrders>
                   fontSize: 14.sp,
                 ),
                 unselectedLabelColor: Colors.black,
-                indicatorPadding: EdgeInsets.all(6),
+                indicatorPadding: EdgeInsets.all(6.r),
                 dividerColor: Colors.blue[900],
                 indicatorSize: TabBarIndicatorSize.tab,
                 indicator: BoxDecoration(
@@ -69,7 +69,7 @@ class _MyOrdersState extends State<MyOrders>
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(15),
+                          padding: EdgeInsets.all(14.r),
                           child: Column(
                             children: [
                               Row(
@@ -393,7 +393,7 @@ class _MyOrdersState extends State<MyOrders>
                                               ),
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.all(4.sp),
+                                              padding: EdgeInsets.all(4.r),
                                               child: Container(
                                                 decoration: BoxDecoration(
                                                   color: Colors.blue,

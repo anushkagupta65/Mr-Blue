@@ -87,7 +87,7 @@ class _MyRequestsState extends State<MyRequests>
                   fontSize: 14.sp,
                 ),
                 unselectedLabelColor: Colors.black,
-                indicatorPadding: EdgeInsets.all(6.w),
+                indicatorPadding: EdgeInsets.all(6.r),
                 dividerColor: Colors.blue[900],
                 indicatorSize: TabBarIndicatorSize.tab,
                 indicator: BoxDecoration(

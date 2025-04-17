@@ -23,7 +23,7 @@ class TermsAndConditions extends StatelessWidget {
           ),
           child: SingleChildScrollView(
             child: Padding(
-              padding: EdgeInsets.all(18.sp),
+              padding: EdgeInsets.all(18.r),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -80,7 +80,7 @@ class TermsAndConditions extends StatelessWidget {
 
   Widget textWithBullet(String text) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 8),
+      padding: EdgeInsets.symmetric(horizontal: 8.w),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
