@@ -123,9 +123,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       SizedBox(height: 18.h),
                       Image.asset(
-                        'assets/images/mr-blue-logo.png',
+                        'assets/images/primary_logo.png',
                         fit: BoxFit.cover,
-                        height: 64.h,
+                        height: 72.h,
                       ),
                       SizedBox(height: 18.h),
                       Text(
@@ -137,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontSize: 12.sp,
                         ),
                       ),
-                      SizedBox(height: 36.h),
+                      SizedBox(height: 24.h),
                       TextField(
                         controller: mobileNumber,
                         keyboardType: TextInputType.number,

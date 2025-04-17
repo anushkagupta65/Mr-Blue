@@ -20,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkLoginStatus() async {
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 3));
 
     await _handleLocationPermission();
 
@@ -165,11 +165,11 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Center(
             child: CircleAvatar(
               backgroundColor: Colors.white,
-              radius: 80.r,
+              radius: 88.r,
               child: Image.asset(
-                'assets/images/mr-blue-logo.png',
+                'assets/images/primary_logo.png',
                 fit: BoxFit.cover,
-                height: 64.h,
+                height: 72.h,
               ),
             ),
           ),

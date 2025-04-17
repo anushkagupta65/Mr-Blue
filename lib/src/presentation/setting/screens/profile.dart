@@ -98,7 +98,7 @@ class _MyProfileState extends State<MyProfile> {
                       backgroundColor: Colors.white,
                       radius: 80.r,
                       child: Image.asset(
-                        'assets/images/mr-blue-logo.png',
+                        'assets/images/primary_logo.png',
                         fit: BoxFit.cover,
                         height: 64.h,
                       ),

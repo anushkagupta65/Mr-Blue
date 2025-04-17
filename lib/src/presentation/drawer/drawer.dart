@@ -60,7 +60,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       backgroundColor: Colors.white,
                       radius: 32.r,
                       child: Image.asset(
-                        'assets/images/mr-blue-logo.png',
+                        'assets/images/primary_logo.png',
                         fit: BoxFit.cover,
                         height: 30.h,
                       ),
