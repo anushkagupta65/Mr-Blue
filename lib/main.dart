@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/presentation/splash/splash.dart';
+import 'package:flutter/services.dart';
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]).then((_) {
+    runApp(const MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -18,10 +25,9 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'mr. blue',
-
           theme: ThemeData(
             fontFamily: 'Poppins',
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue.shade700),
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue.shade900),
           ),
           builder: (context, child) {
             return MediaQuery(

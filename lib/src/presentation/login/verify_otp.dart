@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/home/bottom_navigation.dart';
+import 'package:mr_blue/src/presentation/home/map_screen.dart';
 import 'package:mr_blue/src/services/api_services.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,17 +35,28 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
       await prefs.setString('user_id', userData['user_id'].toString());
       await prefs.setString(
         'user_email',
-        userData['email'] ?? 'abc@example.com',
+        userData['email'] ?? 'example@gmail.com',
       );
       await prefs.setString('user_mobile', userData['mobile'] ?? '');
       debugPrint('Login status and user data saved');
 
+      String? userAddress = prefs.getString('user_address');
+
       if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const Bottomnavigation()),
-        );
-        debugPrint('Navigated to Bottomnavigation');
+        if (userAddress == null || userAddress.isEmpty) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MapScreen(calledFrom: "verify_otp"),
+            ),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const Bottomnavigation()),
+          );
+          debugPrint('Navigated to Bottomnavigation');
+        }
       }
     } catch (e) {
       debugPrint('Error verifying OTP: $e');

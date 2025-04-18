@@ -105,16 +105,10 @@ class _PriceListState extends State<PriceList>
             uniqueSubtrades.isNotEmpty ? uniqueSubtrades[0] : null;
         filterItemsBySubtrade(selectedSubtrade ?? '');
       } else {
-        uniqueSubtrades =
-            allItems
-                .map((item) => item['name']?.toString() ?? '')
-                .toSet()
-                .toList()
-              ..removeWhere((name) => name.isEmpty)
-              ..sort();
-        selectedSubtrade =
-            uniqueSubtrades.isNotEmpty ? uniqueSubtrades[0] : null;
-        filterItemsBySubtrade(selectedSubtrade ?? '');
+        // For Laundry, show all items without subtrade filtering
+        uniqueSubtrades = [];
+        selectedSubtrade = null;
+        filteredItems = allItems;
       }
     });
   }
@@ -136,12 +130,8 @@ class _PriceListState extends State<PriceList>
                 )
                 .toList();
       } else {
-        filteredItems =
-            allItems
-                .where(
-                  (item) => item['name'] == subtrade && item['name'] != null,
-                )
-                .toList();
+        // For Laundry, show all items without filtering
+        filteredItems = allItems;
       }
     });
   }
@@ -192,72 +182,64 @@ class _PriceListState extends State<PriceList>
                         },
                       ),
                       SizedBox(height: 10.h),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 8.w,
-                          vertical: 4.h,
-                        ),
-                        child: SizedBox(
-                          height: 60.h,
-                          child:
-                              uniqueSubtrades.isEmpty
-                                  ? Center(
-                                    child: Text('No categories available'),
-                                  )
-                                  : ListView.builder(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: uniqueSubtrades.length,
-                                    itemBuilder: (context, index) {
-                                      final subtrade = uniqueSubtrades[index];
-                                      bool isSelected =
-                                          subtrade == selectedSubtrade;
-                                      return GestureDetector(
-                                        onTap: () {
-                                          filterItemsBySubtrade(subtrade);
-                                        },
-                                        child: Container(
-                                          margin: EdgeInsets.only(right: 4.w),
-                                          width:
-                                              MediaQuery.of(
-                                                context,
-                                              ).size.width *
-                                              0.36,
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 4.w,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color:
-                                                isSelected
-                                                    ? Colors.blue.shade700
-                                                    : Colors.blue.shade100,
-                                            border: Border.all(
-                                              color: Colors.white,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              8.r,
-                                            ),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              subtrade,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w700,
-                                                color:
-                                                    isSelected
-                                                        ? Colors.white
-                                                        : Colors.black87,
-                                                letterSpacing: 1.sp,
-                                                fontSize: 14.sp,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ),
+                      // Show subtrade filter only for Dry Cleaning
+                      if (serviceNames[tabController!.index] ==
+                              'Dry Cleaning' &&
+                          uniqueSubtrades.isNotEmpty)
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8.w,
+                            vertical: 4.h,
+                          ),
+                          child: SizedBox(
+                            height: 60.h,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: uniqueSubtrades.length,
+                              itemBuilder: (context, index) {
+                                final subtrade = uniqueSubtrades[index];
+                                bool isSelected = subtrade == selectedSubtrade;
+                                return GestureDetector(
+                                  onTap: () {
+                                    filterItemsBySubtrade(subtrade);
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.only(right: 4.w),
+                                    width:
+                                        MediaQuery.of(context).size.width *
+                                        0.36,
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 4.w,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          isSelected
+                                              ? Colors.blue.shade700
+                                              : Colors.blue.shade100,
+                                      border: Border.all(color: Colors.white),
+                                      borderRadius: BorderRadius.circular(8.r),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        subtrade,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          color:
+                                              isSelected
+                                                  ? Colors.white
+                                                  : Colors.black87,
+                                          letterSpacing: 1.sp,
+                                          fontSize: 14.sp,
                                         ),
-                                      );
-                                    },
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
                                   ),
+                                );
+                              },
+                            ),
+                          ),
                         ),
-                      ),
                       Expanded(
                         child: TabBarView(
                           controller: tabController,

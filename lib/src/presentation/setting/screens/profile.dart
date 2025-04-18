@@ -87,160 +87,179 @@ class _MyProfileState extends State<MyProfile> {
               begin: Alignment.bottomCenter,
             ),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: EdgeInsets.all(20.w),
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: Colors.white,
-                      radius: 80.r,
-                      child: Image.asset(
-                        'assets/images/primary_logo.png',
-                        fit: BoxFit.cover,
-                        height: 64.h,
-                      ),
-                    ),
-                    SizedBox(height: 20.h),
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8.w),
-                        border: Border.all(color: Colors.blue.shade900),
-                      ),
-                      child: Row(
-                        children: [
-                          SizedBox(width: 8.w),
-                          Icon(
-                            Icons.person_outline,
-                            color: Colors.blue.shade900,
-                            size: 24.sp,
-                          ),
-                          SizedBox(width: 15.w),
-                          Expanded(
-                            child: TextField(
-                              controller: _name,
-                              decoration: InputDecoration(
-                                hintStyle: TextStyle(
-                                  color: Colors.blue.shade900,
-                                  fontSize: 12.sp,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(20.w),
+                          child: Column(
+                            children: [
+                              CircleAvatar(
+                                backgroundColor: Colors.white,
+                                radius: 80.r,
+                                child: Image.asset(
+                                  'assets/images/primary_logo.png',
+                                  fit: BoxFit.cover,
+                                  height: 64.h,
                                 ),
-                                hintText: "Name",
-                                border: InputBorder.none,
                               ),
+                              SizedBox(height: 20.h),
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8.w),
+                                  border: Border.all(
+                                    color: Colors.blue.shade900,
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    SizedBox(width: 8.w),
+                                    Icon(
+                                      Icons.person_outline,
+                                      color: Colors.blue.shade900,
+                                      size: 24.sp,
+                                    ),
+                                    SizedBox(width: 15.w),
+                                    Expanded(
+                                      child: TextField(
+                                        controller: _name,
+                                        decoration: InputDecoration(
+                                          hintStyle: TextStyle(
+                                            color: Colors.blue.shade900,
+                                            fontSize: 12.sp,
+                                          ),
+                                          hintText: "Name",
+                                          border: InputBorder.none,
+                                        ),
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.blue.shade900,
+                                          letterSpacing: 1,
+                                          fontSize: 12.sp,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 15.h),
+                              InkWell(
+                                onTap: () {
+                                  showToastMessage(
+                                    "Contact number cannot be changed",
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8.w),
+                                    border: Border.all(
+                                      color: Colors.blue.shade900,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(width: 8.w),
+                                      Icon(
+                                        Icons.phone,
+                                        color: Colors.blue.shade900,
+                                        size: 24.sp,
+                                      ),
+                                      SizedBox(width: 2.w),
+                                      Padding(
+                                        padding: EdgeInsets.all(15.w),
+                                        child: Text(
+                                          _mobile,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.blue.shade900,
+                                            letterSpacing: 1,
+                                            fontSize: 12.sp,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 15.h),
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8.w),
+                                  border: Border.all(
+                                    color: Colors.blue.shade900,
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    SizedBox(width: 8.w),
+                                    Icon(
+                                      Icons.mail,
+                                      color: Colors.blue.shade900,
+                                      size: 24.sp,
+                                    ),
+                                    SizedBox(width: 15.w),
+                                    Expanded(
+                                      child: TextField(
+                                        controller: _email,
+                                        decoration: InputDecoration(
+                                          hintText: "Email",
+                                          hintStyle: TextStyle(
+                                            color: Colors.blue.shade900,
+                                            fontSize: 12.sp,
+                                          ),
+                                          border: InputBorder.none,
+                                        ),
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.blue.shade900,
+                                          letterSpacing: 1,
+                                          fontSize: 12.sp,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 20.h),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue.shade700,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 56.w,
+                                vertical: 16.h,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14.w),
+                              ),
+                            ),
+                            onPressed: _updateProfile,
+                            child: Text(
+                              'Update Profile',
                               style: TextStyle(
                                 fontWeight: FontWeight.w500,
-                                color: Colors.blue.shade900,
+                                color: Colors.white,
                                 letterSpacing: 1,
-                                fontSize: 12.sp,
+                                fontSize: 15.sp,
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 15.h),
-                    InkWell(
-                      onTap: () {
-                        showToastMessage("Contact number cannot be changed");
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8.w),
-                          border: Border.all(color: Colors.blue.shade900),
                         ),
-                        child: Row(
-                          children: [
-                            SizedBox(width: 8.w),
-                            Icon(
-                              Icons.phone,
-                              color: Colors.blue.shade900,
-                              size: 24.sp,
-                            ),
-                            SizedBox(width: 2.w),
-                            Padding(
-                              padding: EdgeInsets.all(15.w),
-                              child: Text(
-                                _mobile,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.blue.shade900,
-                                  letterSpacing: 1,
-                                  fontSize: 12.sp,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 15.h),
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8.w),
-                        border: Border.all(color: Colors.blue.shade900),
-                      ),
-                      child: Row(
-                        children: [
-                          SizedBox(width: 8.w),
-                          Icon(
-                            Icons.mail,
-                            color: Colors.blue.shade900,
-                            size: 24.sp,
-                          ),
-                          SizedBox(width: 15.w),
-                          Expanded(
-                            child: TextField(
-                              controller: _email,
-                              decoration: InputDecoration(
-                                hintText: "Email",
-                                hintStyle: TextStyle(
-                                  color: Colors.blue.shade900,
-                                  fontSize: 12.sp,
-                                ),
-                                border: InputBorder.none,
-                              ),
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                color: Colors.blue.shade900,
-                                letterSpacing: 1,
-                                fontSize: 12.sp,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 20.h),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue.shade700,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 56.w,
-                      vertical: 16.h,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14.w),
-                    ),
-                  ),
-                  onPressed: _updateProfile,
-                  child: Text(
-                    'Update Profile',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
-                      letterSpacing: 1,
-                      fontSize: 15.sp,
+                      ],
                     ),
                   ),
                 ),
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),

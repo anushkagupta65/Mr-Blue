@@ -248,7 +248,10 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                                   onTap: () {
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
-                                        builder: (context) => MapScreen(),
+                                        builder:
+                                            (context) => MapScreen(
+                                              calledFrom: "order_summary",
+                                            ),
                                       ),
                                     );
                                   },

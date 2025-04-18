@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/presentation/home/bottom_navigation.dart';
+import 'package:mr_blue/src/presentation/home/map_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mr_blue/src/presentation/login/login.dart';
 import 'package:geolocator/geolocator.dart';
@@ -20,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkLoginStatus() async {
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(milliseconds: 1500));
 
     await _handleLocationPermission();
 
@@ -29,13 +30,25 @@ class _SplashScreenState extends State<SplashScreen> {
 
     final double? storedLat = prefs.getDouble('latitude');
     final double? storedLong = prefs.getDouble('longitude');
-    print('Stored Latitude: $storedLat, Stored Longitude: $storedLong');
+    final String? userAddress = prefs.getString('user_address');
+    print(
+      'Stored Latitude: $storedLat, Stored Longitude: $storedLong, Address: $userAddress',
+    );
 
     if (isLoggedIn) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Bottomnavigation()),
-      );
+      if (userAddress == null || userAddress.isEmpty) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const MapScreen(calledFrom: "splash_screen"),
+          ),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Bottomnavigation()),
+        );
+      }
     } else {
       Navigator.pushReplacement(
         context,

@@ -9,8 +9,9 @@ Widget customDivider() {
   return Divider(color: Colors.blue.shade100, height: 0.4);
 }
 
-dynamic customAppBar(String title) {
+AppBar customAppBar(String title, {Widget? leading}) {
   return AppBar(
+    leading: leading,
     backgroundColor: Colors.blue.shade700,
     title: Text(
       title,
