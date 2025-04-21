@@ -50,16 +50,14 @@ Future<void> call(String phoneNumber) async {
         throw 'Could not launch dialer';
       }
     } catch (e) {
-      print('Error: $e');
+      showToastMessage("Something went wrong while calling");
     }
-  } else {
-    print('Phone permission denied');
-  }
+  } else {}
 }
 
 void shareApplication() {
   String text =
-      'Hey there! Check out this app: Mr BLUE.\nPicks up, Cleans and Delivers your laundry right to your doorstep!\n\nDownload it now and enjoy the convenience!';
+      'Hey there! Check out this app: mr. blue.\nPicks up, Cleans and Delivers your laundry right to your doorstep!\n\nDownload it now and enjoy the convenience!';
   String url = 'https://play.google.com/store/apps/details?id=com.mrblue';
   Share.share('$text\n\n$url');
 }
@@ -73,18 +71,14 @@ Future<void> openWhatsAppChat(String phoneNumber, {String? message}) async {
       url += '?text=${Uri.encodeComponent(message)}';
     }
 
-    print('Attempting to launch WhatsApp URL: $url');
-
     final Uri whatsappUrl = Uri.parse(url);
 
     if (await canLaunchUrl(whatsappUrl)) {
       await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
     } else {
-      print('WhatsApp app not installed, attempting to open in browser');
       await launchUrl(whatsappUrl, mode: LaunchMode.platformDefault);
     }
   } catch (e) {
-    print('Error launching WhatsApp: $e');
     throw 'Could not launch WhatsApp. Please ensure WhatsApp is installed or try again.';
   }
 }

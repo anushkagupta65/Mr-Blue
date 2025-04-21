@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
+import 'package:mr_blue/src/services/api_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ContactUs extends StatefulWidget {
   const ContactUs({super.key});
@@ -13,7 +15,54 @@ class _ContactUsState extends State<ContactUs> {
   final List<String> items = ['Query', 'Feedback', 'Complaints'];
   String? selectedValue;
   bool isSelected = false;
-  final message = TextEditingController();
+  final messageController = TextEditingController();
+  bool isLoading = false;
+
+  Future<Map<String, String>> _getUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {
+      'name': prefs.getString('user_name') ?? 'User',
+      'email': prefs.getString('user_email') ?? 'No email',
+      'phone': prefs.getString('user_mobile') ?? 'No mobile',
+    };
+  }
+
+  Future<void> _handleSubmit() async {
+    if (selectedValue == null || messageController.text.isEmpty) {
+      showToastMessage('Please select a service and enter a message');
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final userData = await _getUserData();
+      final formattedMessage = '$selectedValue - ${messageController.text}';
+
+      await ApiService().submitContactUs(
+        userData['name']!,
+        userData['email']!,
+        userData['phone']!,
+        formattedMessage,
+      );
+
+      showToastMessage('Message sent successfully');
+
+      setState(() {
+        selectedValue = null;
+        messageController.clear();
+        isSelected = false;
+      });
+    } catch (e) {
+      showToastMessage('Failed to send message: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,9 +175,10 @@ class _ContactUsState extends State<ContactUs> {
                                 child: Padding(
                                   padding: EdgeInsets.symmetric(
                                     horizontal: 10.w,
+                                    vertical: 4.h,
                                   ),
                                   child: TextField(
-                                    controller: message,
+                                    controller: messageController,
                                     decoration: InputDecoration(
                                       hintText:
                                           isSelected
@@ -147,7 +197,6 @@ class _ContactUsState extends State<ContactUs> {
                                 ),
                               ),
                             ),
-
                             Expanded(
                               child: Align(
                                 alignment: Alignment.bottomCenter,
@@ -176,19 +225,28 @@ class _ContactUsState extends State<ContactUs> {
                                     ),
                                     Flexible(
                                       child: InkWell(
-                                        onTap: () {},
+                                        onTap: isLoading ? null : _handleSubmit,
                                         child: Container(
                                           height: 60.h,
-                                          color: Colors.blue[700],
+                                          color:
+                                              isLoading
+                                                  ? Colors.blue[400]
+                                                  : Colors.blue[700],
                                           child: Center(
-                                            child: Text(
-                                              'Send',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.white,
-                                                fontSize: 15.sp,
-                                              ),
-                                            ),
+                                            child:
+                                                isLoading
+                                                    ? CircularProgressIndicator(
+                                                      color: Colors.white,
+                                                    )
+                                                    : Text(
+                                                      'Send',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Colors.white,
+                                                        fontSize: 15.sp,
+                                                      ),
+                                                    ),
                                           ),
                                         ),
                                       ),

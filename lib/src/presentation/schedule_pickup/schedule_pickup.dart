@@ -24,7 +24,7 @@ class _BookingScreenState extends State<BookingScreen> {
   );
   List<Map<String, dynamic>> availableTimes = [];
   int? timeid;
-  int selectedValue = 1;
+  int selectedValue = -1;
   String? sameOrNextDay;
   List<dynamic> addresses = [];
   bool isLoading = false;
@@ -219,7 +219,7 @@ class _BookingScreenState extends State<BookingScreen> {
                                   crossAxisCount: 3,
                                   crossAxisSpacing: 12.w,
                                   mainAxisSpacing: 12.h,
-                                  childAspectRatio: 1.5,
+                                  childAspectRatio: 2,
                                 ),
                             itemBuilder: (context, index) {
                               final time = availableTimes[index];
@@ -293,7 +293,7 @@ class _BookingScreenState extends State<BookingScreen> {
                       child: ChoiceChip(
                         checkmarkColor: Colors.white,
                         label: Text(
-                          'Express Service',
+                          'Same Day',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 12.sp,
@@ -315,12 +315,15 @@ class _BookingScreenState extends State<BookingScreen> {
                           vertical: 4.h,
                         ),
                         onSelected: (selected) {
-                          if (selected) {
-                            setState(() {
+                          setState(() {
+                            if (selectedValue == 0) {
+                              selectedValue = -1;
+                              sameOrNextDay = null;
+                            } else {
                               selectedValue = 0;
                               sameOrNextDay = "1";
-                            });
-                          }
+                            }
+                          });
                         },
                       ),
                     ),
@@ -329,7 +332,7 @@ class _BookingScreenState extends State<BookingScreen> {
                       child: ChoiceChip(
                         checkmarkColor: Colors.white,
                         label: Text(
-                          'Normal Service',
+                          'Next Day',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 12.sp,
@@ -351,12 +354,15 @@ class _BookingScreenState extends State<BookingScreen> {
                           vertical: 4.h,
                         ),
                         onSelected: (selected) {
-                          if (selected) {
-                            setState(() {
-                              selectedValue = 1;
+                          setState(() {
+                            if (selectedValue == 1) {
+                              selectedValue = -1;
                               sameOrNextDay = null;
-                            });
-                          }
+                            } else {
+                              selectedValue = 1;
+                              sameOrNextDay = "1";
+                            }
+                          });
                         },
                       ),
                     ),
@@ -383,6 +389,7 @@ class _BookingScreenState extends State<BookingScreen> {
                                   timeSlot:
                                       selectedTime['combine_time'].toString(),
                                   timeSlotId: selectedTime['id'].toString(),
+                                  selectedValue: selectedValue.toString(),
                                 ),
                           ),
                         );

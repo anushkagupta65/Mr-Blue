@@ -392,6 +392,42 @@ class ApiService {
     }
   }
 
+  Future<String> submitContactUs(
+    String name,
+    String email,
+    String phone,
+    String message,
+  ) async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$_baseUrl/contact-us'),
+      );
+
+      request.fields.addAll({
+        'name': name,
+        'email': email,
+        'phone': phone,
+        'message': message,
+      });
+
+      request.headers.addAll(_getHeaders());
+
+      http.StreamedResponse response = await request.send();
+      String responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return responseBody;
+      } else {
+        throw Exception(
+          'Failed: ${response.statusCode} - ${response.reasonPhrase}',
+        );
+      }
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
   // ================================================================ TO HANDLE EXCEPTION ===================================================
   /// Handles errors that occur during API requests.
   Exception _handleError(dynamic error) {

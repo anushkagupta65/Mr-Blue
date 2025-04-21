@@ -15,6 +15,7 @@ class OrderSummaryScreen extends StatefulWidget {
   final String sameOrNextDay;
   final String timeSlotId;
   final String timeSlot;
+  final String selectedValue;
 
   const OrderSummaryScreen({
     super.key,
@@ -22,6 +23,7 @@ class OrderSummaryScreen extends StatefulWidget {
     required this.sameOrNextDay,
     required this.timeSlotId,
     required this.timeSlot,
+    required this.selectedValue,
   });
 
   @override
@@ -75,10 +77,12 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
   Future<void> fetchDeliveryDateTime() async {
     DateTime parsedDate = DateTime.parse(widget.picdate);
     setState(() {
-      if (widget.sameOrNextDay == "1") {
+      if (widget.sameOrNextDay == "1" && widget.selectedValue == "0") {
+        deliveryDateTime = parsedDate;
+      } else if (widget.sameOrNextDay == "1" && widget.selectedValue == "1") {
         deliveryDateTime = parsedDate.add(Duration(days: 1));
       } else {
-        deliveryDateTime = parsedDate.add(Duration(days: 5));
+        deliveryDateTime = parsedDate.add(Duration(days: 3));
       }
     });
   }
@@ -261,7 +265,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                                         : "Do you want to change address ..?",
                                     style: TextStyle(
                                       wordSpacing: 2,
-                                      fontSize: 12.sp,
+                                      fontSize: 10.sp,
                                       fontWeight: FontWeight.w600,
                                       fontStyle: FontStyle.italic,
                                       decoration: TextDecoration.underline,
@@ -314,6 +318,37 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                             TextField(
                               readOnly: true,
                               decoration: InputDecoration(
+                                suffixIcon:
+                                    widget.selectedValue == "-1"
+                                        ? IconButton(
+                                          icon: Icon(
+                                            Icons.calendar_today,
+                                            color: Colors.grey.shade600,
+                                          ),
+                                          onPressed: () async {
+                                            DateTime? pickedDate =
+                                                await showDatePicker(
+                                                  context: context,
+
+                                                  initialDate: DateTime.parse(
+                                                    dropdate,
+                                                  ),
+                                                  firstDate: DateTime.parse(
+                                                    dropdate,
+                                                  ),
+                                                  lastDate: DateTime(2100),
+                                                );
+                                            if (pickedDate != null) {
+                                              String formattedDate = DateFormat(
+                                                'yyyy-MM-dd',
+                                              ).format(pickedDate);
+                                              setState(() {
+                                                dropdate = formattedDate;
+                                              });
+                                            }
+                                          },
+                                        )
+                                        : null,
                                 hintText: '$dropdate, ${widget.timeSlot}',
                                 hintStyle: TextStyle(color: Colors.black),
                                 border: OutlineInputBorder(

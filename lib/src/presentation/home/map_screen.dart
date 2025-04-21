@@ -8,7 +8,7 @@ import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/home/bottom_navigation.dart';
 import 'package:mr_blue/src/presentation/schedule_pickup/screens/booking_confirmation.dart';
 import 'package:mr_blue/src/services/api_services.dart';
-import 'package:permission_handler/permission_handler.dart' as AppSettings;
+import 'package:permission_handler/permission_handler.dart' as app_settings;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MapScreen extends StatefulWidget {
@@ -88,7 +88,7 @@ class _MapScreenState extends State<MapScreen> {
               TextButton(
                 onPressed: () async {
                   Navigator.of(context).pop();
-                  await AppSettings.openAppSettings();
+                  await app_settings.openAppSettings();
                   Navigator.of(context).pop();
                 },
                 child: const Text('Open Settings'),
