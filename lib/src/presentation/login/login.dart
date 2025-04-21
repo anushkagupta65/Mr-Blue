@@ -190,10 +190,20 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: Text(
                               "Accept Terms & Conditions.",
                               style: TextStyle(
+                                decoration: TextDecoration.underline,
+                                decorationColor: Colors.blue.shade600,
+                                decorationThickness: 2,
+                                shadows: [
+                                  Shadow(
+                                    offset: Offset(0, 1),
+                                    color: Colors.black54,
+                                  ),
+                                ],
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black,
+                                wordSpacing: 2,
                                 letterSpacing: 1,
-                                fontSize: 10.sp,
+                                fontSize: 12.sp,
                               ),
                             ),
                           ),

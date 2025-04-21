@@ -38,9 +38,7 @@ void showToastMessage(String message) {
 }
 
 Future<void> call(String phoneNumber) async {
-  String formattedNumber =
-      phoneNumber.startsWith('+') ? phoneNumber : '+91$phoneNumber';
-  final Uri telUri = Uri(scheme: 'tel', path: formattedNumber);
+  final Uri telUri = Uri(scheme: 'tel', path: phoneNumber);
 
   final status = await Permission.phone.request();
 
@@ -66,15 +64,27 @@ void shareApplication() {
   Share.share('$text\n\n$url');
 }
 
-Future<void> openWhatsApp() async {
-  final Uri whatsappUri = Uri.parse('https://wa.me/7011744407');
+Future<void> openWhatsAppChat(String phoneNumber, {String? message}) async {
   try {
-    if (await canLaunchUrl(whatsappUri)) {
-      await launchUrl(whatsappUri);
+    phoneNumber = phoneNumber.replaceAll(RegExp(r'[^0-9+]'), '');
+
+    String url = 'https://wa.me/$phoneNumber';
+    if (message != null && message.isNotEmpty) {
+      url += '?text=${Uri.encodeComponent(message)}';
+    }
+
+    print('Attempting to launch WhatsApp URL: $url');
+
+    final Uri whatsappUrl = Uri.parse(url);
+
+    if (await canLaunchUrl(whatsappUrl)) {
+      await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
     } else {
-      throw 'Could not launch WhatsApp';
+      print('WhatsApp app not installed, attempting to open in browser');
+      await launchUrl(whatsappUrl, mode: LaunchMode.platformDefault);
     }
   } catch (e) {
-    print('Error: $e');
+    print('Error launching WhatsApp: $e');
+    throw 'Could not launch WhatsApp. Please ensure WhatsApp is installed or try again.';
   }
 }

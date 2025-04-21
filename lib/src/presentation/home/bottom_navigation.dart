@@ -86,7 +86,10 @@ class _BottomnavigationState extends State<Bottomnavigation> {
     } else if (index == 2) {
       call("9555900059");
     } else if (index == 3) {
-      openWhatsApp();
+      openWhatsAppChat(
+        "9555900059",
+        message: "Hello! Mr. Blue, I am Interested in your services.",
+      );
     }
   }
 
@@ -111,7 +114,7 @@ class _BottomnavigationState extends State<Bottomnavigation> {
         ),
         unselectedIconTheme: IconThemeData(color: Colors.white70, size: 20.sp),
         selectedIconTheme: IconThemeData(color: Colors.white, size: 20.sp),
-        items: const [
+        items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
@@ -119,7 +122,12 @@ class _BottomnavigationState extends State<Bottomnavigation> {
           ),
           BottomNavigationBarItem(icon: Icon(Icons.call), label: 'Call'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat_outlined),
+            icon: Image.asset(
+              "assets/images/whatsapp-icon.png",
+              height: 20.h,
+
+              color: Colors.white70,
+            ),
             label: 'WhatsApp',
           ),
         ],

@@ -157,7 +157,7 @@ class _ContactUsState extends State<ContactUs> {
                                   children: [
                                     Flexible(
                                       child: InkWell(
-                                        onTap: () => call(""),
+                                        onTap: () => call("9555900059"),
                                         child: Container(
                                           height: 60.h,
                                           color: Colors.blue[700],
