@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/drawer/drawer.dart';
 import 'package:mr_blue/src/presentation/home/map_screen.dart';
+import 'package:mr_blue/src/presentation/login/terms_and_conditions.dart';
 import 'package:mr_blue/src/presentation/setting/screens/about_us.dart';
 import 'package:mr_blue/src/presentation/setting/screens/profile.dart';
 
@@ -89,10 +90,10 @@ class _SettingState extends State<Setting> {
                 },
                 child: ListTile(
                   title: Text("About us", style: textStyle),
-                  leading: Icon(
-                    Icons.article_outlined,
+                  leading: Image.asset(
+                    "assets/images/round-information-outline-black-icon.png",
                     color: blueColor,
-                    size: 24.sp,
+                    height: 20.h,
                   ),
                 ),
               ),
@@ -101,11 +102,20 @@ class _SettingState extends State<Setting> {
               SizedBox(height: 7.h),
               InkWell(
                 onTap: () {
-                  call("9555900059");
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const TermsAndConditions(),
+                    ),
+                  );
                 },
                 child: ListTile(
-                  title: Text("Call us", style: textStyle),
-                  leading: Icon(Icons.call, color: blueColor, size: 24.sp),
+                  title: Text("Terms & Conditions", style: textStyle),
+                  leading: Image.asset(
+                    "assets/images/terms-and-conditions-icon.png",
+                    color: blueColor,
+                    height: 20.h,
+                  ),
                 ),
               ),
               SizedBox(height: 7.h),

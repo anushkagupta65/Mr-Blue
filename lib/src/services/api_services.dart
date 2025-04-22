@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -228,10 +230,7 @@ class ApiService {
 
   // ================================================================ TO POST USER'S LOCATION ===================================================
   /// Posts the user's location with latitude and longitude.
-  Future<String> postUserLocation(
-    // String latitude,
-    // String longitude,
-  ) async {
+  Future<String> postUserLocation(String latitude, String longitude) async {
     try {
       var request = http.MultipartRequest(
         'POST',
@@ -239,10 +238,10 @@ class ApiService {
       );
 
       request.fields.addAll({
-        // 'latitude': latitude,
-        // 'longitude': longitude,
-        'latitude': '28.536165745526322',
-        'longitude': '77.14089179999999',
+        'latitude': latitude,
+        'longitude': longitude,
+        // 'latitude': '28.536165745526322',
+        // 'longitude': '77.14089179999999',
       });
       request.headers.addAll(_getHeaders());
 
@@ -418,6 +417,30 @@ class ApiService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return responseBody;
+      } else {
+        throw Exception(
+          'Failed: ${response.statusCode} - ${response.reasonPhrase}',
+        );
+      }
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  Future<List<String>> getStoreNames() async {
+    try {
+      var request = http.Request('GET', Uri.parse('$_baseUrl/new-stores'));
+
+      request.headers.addAll(_getHeaders());
+
+      http.StreamedResponse response = await request.send();
+
+      String responseBody = await response.stream.bytesToString();
+      if (response.statusCode == 200) {
+        List<dynamic> stores = jsonDecode(responseBody);
+        List<String> storeNames =
+            stores.map((store) => store['name'].toString()).toList();
+        return storeNames;
       } else {
         throw Exception(
           'Failed: ${response.statusCode} - ${response.reasonPhrase}',

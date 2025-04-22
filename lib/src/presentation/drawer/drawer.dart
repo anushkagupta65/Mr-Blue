@@ -4,7 +4,6 @@ import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/drawer/screens/contact_us.dart';
 import 'package:mr_blue/src/presentation/drawer/screens/logout.dart';
 import 'package:mr_blue/src/presentation/drawer/screens/my_orders.dart';
-import 'package:mr_blue/src/presentation/drawer/screens/my_requests.dart';
 import 'package:mr_blue/src/presentation/drawer/screens/price_list.dart';
 import 'package:mr_blue/src/presentation/home/bottom_navigation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,7 +15,7 @@ class CustomDrawer extends StatefulWidget {
   State<CustomDrawer> createState() => _CustomDrawerState();
 }
 
-int _activeDrawerIndex = 0;
+int _activeDrawerIndex = 1;
 
 class _CustomDrawerState extends State<CustomDrawer> {
   String _name = '';
@@ -120,14 +119,19 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 ),
               ),
             ),
-            _buildMenuItem(
-              icon: Icons.home,
+            menuTile(
+              icon: Icon(
+                Icons.home,
+                color:
+                    _activeDrawerIndex == 1 ? Colors.white : Colors.blue[900],
+                size: 20.sp,
+              ),
               title: 'Home',
-              index: 0,
-              isActive: _activeDrawerIndex == 0,
+              index: 1,
+              isActive: _activeDrawerIndex == 1,
               onTap: () {
                 setState(() {
-                  _activeDrawerIndex = 0;
+                  _activeDrawerIndex = 1;
                 });
                 Navigator.push(
                   context,
@@ -138,30 +142,40 @@ class _CustomDrawerState extends State<CustomDrawer> {
               },
             ),
             customDivider(),
-            _buildMenuItem(
-              icon: Icons.shopping_bag_outlined,
-              title: 'My Requests',
-              index: 3,
-              isActive: _activeDrawerIndex == 3,
-              onTap: () {
-                setState(() {
-                  _activeDrawerIndex = 3;
-                });
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MyRequests()),
-                );
-              },
-            ),
-            customDivider(),
-            _buildMenuItem(
-              icon: Icons.shopping_cart_outlined,
+            // menuTile(
+            //   icon: Icon(
+            //     Icons.shopping_bag_outlined,
+            //     color:
+            //         _activeDrawerIndex == 1 ? Colors.white : Colors.blue[900],
+            //     size: 20.sp,
+            //   ),
+            //   title: 'My Requests',
+            //   index: 3,
+            //   isActive: _activeDrawerIndex == 3,
+            //   onTap: () {
+            //     setState(() {
+            //       _activeDrawerIndex = 3;
+            //     });
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(builder: (context) => MyRequests()),
+            //     );
+            //   },
+            // ),
+            // customDivider(),
+            menuTile(
+              icon: Image.asset(
+                "assets/images/orders-icon.png",
+                color:
+                    _activeDrawerIndex == 2 ? Colors.white : Colors.blue[900],
+                height: 18.h,
+              ),
               title: 'My Orders',
-              index: 4,
-              isActive: _activeDrawerIndex == 4,
+              index: 2,
+              isActive: _activeDrawerIndex == 2,
               onTap: () {
                 setState(() {
-                  _activeDrawerIndex = 4;
+                  _activeDrawerIndex = 2;
                 });
                 Navigator.push(
                   context,
@@ -170,14 +184,19 @@ class _CustomDrawerState extends State<CustomDrawer> {
               },
             ),
             customDivider(),
-            _buildMenuItem(
-              icon: Icons.price_change_outlined,
+            menuTile(
+              icon: Image.asset(
+                "assets/images/rupee-price-list-icon.png",
+                color:
+                    _activeDrawerIndex == 3 ? Colors.white : Colors.blue[900],
+                height: 18.h,
+              ),
               title: 'Price List',
-              index: 6,
-              isActive: _activeDrawerIndex == 6,
+              index: 3,
+              isActive: _activeDrawerIndex == 3,
               onTap: () {
                 setState(() {
-                  _activeDrawerIndex = 6;
+                  _activeDrawerIndex = 3;
                 });
                 Navigator.push(
                   context,
@@ -186,14 +205,19 @@ class _CustomDrawerState extends State<CustomDrawer> {
               },
             ),
             customDivider(),
-            _buildMenuItem(
-              icon: Icons.mail_outline,
+            menuTile(
+              icon: Image.asset(
+                "assets/images/feedback-icon.png",
+                color:
+                    _activeDrawerIndex == 4 ? Colors.white : Colors.blue[900],
+                height: 18.h,
+              ),
               title: 'Contact Us',
-              index: 7,
-              isActive: _activeDrawerIndex == 7,
+              index: 4,
+              isActive: _activeDrawerIndex == 4,
               onTap: () {
                 setState(() {
-                  _activeDrawerIndex = 7;
+                  _activeDrawerIndex = 4;
                 });
                 Navigator.push(
                   context,
@@ -202,14 +226,19 @@ class _CustomDrawerState extends State<CustomDrawer> {
               },
             ),
             customDivider(),
-            _buildMenuItem(
-              icon: Icons.logout,
+            menuTile(
+              icon: Icon(
+                Icons.logout,
+                color:
+                    _activeDrawerIndex == 5 ? Colors.white : Colors.blue[900],
+                size: 20.sp,
+              ),
               title: 'Logout ',
-              index: 9,
-              isActive: _activeDrawerIndex == 9,
+              index: 5,
+              isActive: _activeDrawerIndex == 5,
               onTap: () {
                 setState(() {
-                  _activeDrawerIndex = 9;
+                  _activeDrawerIndex = 5;
                 });
                 Navigator.pop(context);
                 LogoutDialog.show(context);
@@ -221,8 +250,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
     );
   }
 
-  Widget _buildMenuItem({
-    required IconData icon,
+  Widget menuTile({
+    required Widget icon,
     required String title,
     required int index,
     required bool isActive,
@@ -243,19 +272,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Icon(
-                  icon,
-                  color: isActive ? Colors.white : Colors.blue[900],
-                  size: 18.sp,
-                ),
-                SizedBox(width: 14.w),
+                icon,
+                SizedBox(width: 16.w),
                 Text(
                   title,
                   style: TextStyle(
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w900,
                     color: isActive ? Colors.white : Colors.blue[900],
                     letterSpacing: 1,
-                    fontSize: 12.sp,
+                    fontSize: 14.sp,
                   ),
                 ),
               ],

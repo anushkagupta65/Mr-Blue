@@ -56,7 +56,7 @@ class _BottomnavigationState extends State<Bottomnavigation> {
 
       print('DEBUG: Latitude: $latitude, Longitude: $longitude');
 
-      String response = await _apiService.postUserLocation();
+      String response = await _apiService.postUserLocation(latitude, longitude);
       final responseBody = jsonDecode(response);
 
       print('DEBUG: API Response: $responseBody');
