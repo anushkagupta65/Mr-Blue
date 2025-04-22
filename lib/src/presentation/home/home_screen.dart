@@ -1,197 +1,68 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_google_maps_webservices/places.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/drawer/drawer.dart';
+import 'package:mr_blue/src/presentation/home/helper_methods.dart';
 import 'package:mr_blue/src/presentation/home/map_screen.dart';
 import 'package:mr_blue/src/presentation/schedule_pickup/schedule_pickup.dart';
-import 'dart:convert';
-import 'package:mr_blue/src/services/api_services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:async';
-import 'package:uuid/uuid.dart';
+import 'package:flutter_google_maps_webservices/places.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final double? initialLat;
+  final double? initialLng;
+  final String? responseText;
+
+  const HomeScreen({
+    super.key,
+    this.initialLat,
+    this.initialLng,
+    this.responseText,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final ApiService _apiService = ApiService();
+  late HelperMethods helpers;
   List<Map<String, dynamic>> _services = [];
   bool _isLoading = true;
-  final TextEditingController _searchController = TextEditingController();
   String _displayAddress = "Add Location";
-  final GoogleMapsPlaces _places = GoogleMapsPlaces(
-    apiKey: 'AIzaSyCHnauUdIQDCprpFfdj6-JRlskIDTzWg94',
-  );
   List<Prediction> _predictions = [];
   bool _showSuggestions = false;
-  double? _selectedLat;
-  double? _selectedLng;
-  Timer? _debounce;
-  String _sessionToken = const Uuid().v4();
   bool _noStoreFound = false;
-  bool _locationSelected = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchServices();
-    _loadSavedAddress();
-  }
-
-  Future<void> _loadSavedAddress() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedAddress = prefs.getString('user_address');
-    setState(() {
-      _displayAddress =
-          savedAddress != null && savedAddress.isNotEmpty
-              ? savedAddress
-              : "Please add location..";
-    });
-  }
-
-  Future<void> _fetchServices() async {
-    try {
-      String response = await _apiService.getServices();
-      Map<String, dynamic> responseData = jsonDecode(response);
-      List<dynamic> servicesData = responseData['services'] ?? [];
-      print('Services Data: $servicesData');
+    helpers = HelperMethods(
+      initialLat: widget.initialLat,
+      initialLng: widget.initialLng,
+      responseText: widget.responseText,
+    );
+    helpers.onServicesUpdated = (services, isLoading, noStoreFound) {
       setState(() {
-        _services =
-            servicesData
-                .map(
-                  (service) => {
-                    'name': service['name'] ?? 'Unknown Service',
-                    'imageUrl': service['image'] ?? '',
-                  },
-                )
-                .toList();
-        _isLoading = false;
-        _noStoreFound = false;
+        _services = services;
+        _isLoading = isLoading;
+        _noStoreFound = noStoreFound;
       });
-    } catch (e) {
-      print('Error fetching services: $e');
+    };
+    helpers.onAddressUpdated = (displayAddress) {
       setState(() {
-        _isLoading = false;
+        _displayAddress = displayAddress;
       });
-      showToastMessage('Failed to load services');
-    }
-  }
-
-  Future<void> _searchPlaces(String input) async {
-    if (_debounce?.isActive ?? false) _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 300), () async {
-      if (input.isEmpty) {
-        setState(() {
-          _predictions = [];
-          _showSuggestions = false;
-        });
-        return;
-      }
-
-      try {
-        List<Prediction> allPredictions = [];
-        final queries = [input, '$input ', '$input city', '$input street'];
-
-        for (final query in queries) {
-          PlacesAutocompleteResponse response = await _places.autocomplete(
-            query,
-            language: 'en',
-            sessionToken: _sessionToken,
-          );
-          allPredictions.addAll(response.predictions);
-          if (allPredictions.length >= 30) break;
-        }
-
-        final seenPlaceIds = <String>{};
-        _predictions =
-            allPredictions.where((prediction) {
-              final placeId = prediction.placeId;
-              if (placeId != null && !seenPlaceIds.contains(placeId)) {
-                seenPlaceIds.add(placeId);
-                return true;
-              }
-              return false;
-            }).toList();
-
-        setState(() {
-          _showSuggestions = true;
-        });
-      } catch (e) {
-        print('Error searching places: $e');
-        showToastMessage('Failed to search places');
-        setState(() {
-          _showSuggestions = false;
-        });
-      }
-    });
-  }
-
-  Future<void> _selectPlace(Prediction prediction) async {
-    try {
-      PlacesDetailsResponse detail = await _places.getDetailsByPlaceId(
-        prediction.placeId!,
-        sessionToken: _sessionToken,
-      );
-      final lat = detail.result.geometry?.location.lat;
-      final lng = detail.result.geometry?.location.lng;
-
-      if (lat != null && lng != null) {
-        setState(() {
-          _selectedLat = lat;
-          _selectedLng = lng;
-          _searchController.clear();
-          _predictions = [];
-          _showSuggestions = false;
-          _sessionToken = const Uuid().v4();
-          _locationSelected = true;
-        });
-        print('Selected Location: Latitude: $lat, Longitude: $lng');
-
-        try {
-          String response = await _apiService.postUserLocation(
-            lat.toString(),
-            lng.toString(),
-          );
-          print(
-            '========================= API Response ========================: $response',
-          );
-          final responseBody = jsonDecode(response);
-          final responseText = responseBody['Text'] ?? '';
-          showToastMessage(responseText);
-
-          if (responseText == "No store found in this location.") {
-            setState(() {
-              _noStoreFound = true;
-              _services = [];
-            });
-          } else {
-            setState(() {
-              _noStoreFound = false;
-            });
-            await _fetchServices();
-          }
-        } catch (e) {
-          print('Error posting user location: $e');
-          showToastMessage('Failed to send location to server');
-        }
-      } else {
-        showToastMessage('Could not retrieve coordinates');
-      }
-    } catch (e) {
-      print('Error fetching place details: $e');
-      showToastMessage('Failed to fetch place details');
-    }
+    };
+    helpers.onPredictionsUpdated = (predictions, showSuggestions) {
+      setState(() {
+        _predictions = predictions;
+        _showSuggestions = showSuggestions;
+      });
+    };
   }
 
   @override
   void dispose() {
-    _searchController.dispose();
-    _debounce?.cancel();
+    helpers.dispose();
     super.dispose();
   }
 
@@ -273,23 +144,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     SizedBox(height: 10.h),
                                     TextField(
-                                      controller: _searchController,
+                                      controller: helpers.searchController,
                                       decoration: InputDecoration(
                                         labelStyle: TextStyle(fontSize: 10.sp),
                                         hintStyle: TextStyle(fontSize: 10.sp),
                                         hintText: 'Search for location',
                                         prefixIcon: const Icon(Icons.search),
                                         suffixIcon:
-                                            _searchController.text.isNotEmpty
+                                            helpers
+                                                    .searchController
+                                                    .text
+                                                    .isNotEmpty
                                                 ? IconButton(
                                                   icon: const Icon(Icons.clear),
-                                                  onPressed: () {
-                                                    _searchController.clear();
-                                                    setState(() {
-                                                      _predictions = [];
-                                                      _showSuggestions = false;
-                                                    });
-                                                  },
+                                                  onPressed:
+                                                      helpers.clearSearch,
                                                 )
                                                 : null,
                                         border: OutlineInputBorder(
@@ -300,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         filled: true,
                                         fillColor: Colors.blue.shade50,
                                       ),
-                                      onChanged: _searchPlaces,
+                                      onChanged: helpers.searchPlaces,
                                     ),
                                     if (_showSuggestions &&
                                         _predictions.isNotEmpty)
@@ -334,8 +203,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 prediction.description ?? '',
                                               ),
                                               onTap:
-                                                  () =>
-                                                      _selectPlace(prediction),
+                                                  () => helpers.selectPlace(
+                                                    prediction,
+                                                  ),
                                             );
                                           },
                                         ),
@@ -359,181 +229,136 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 child: SizedBox(
                                   height: 180.h,
-                                  child: Center(
-                                    child:
-                                        _noStoreFound
-                                            ? Text(
-                                              'No store found in this location.',
-                                              style: TextStyle(
-                                                fontSize: 16.sp,
-                                                color: Colors.grey,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            )
-                                            : Column(
-                                              children: [
-                                                Expanded(
-                                                  child: ListView.builder(
-                                                    shrinkWrap: true,
-                                                    scrollDirection:
-                                                        Axis.horizontal,
-                                                    physics:
-                                                        const BouncingScrollPhysics(),
-                                                    itemCount: _services.length,
-                                                    itemBuilder: (
-                                                      context,
-                                                      index,
-                                                    ) {
-                                                      final service =
-                                                          _services[index];
-                                                      return InkWell(
-                                                        onTap:
-                                                            _locationSelected
-                                                                ? () {
-                                                                  Navigator.push(
-                                                                    context,
-                                                                    MaterialPageRoute(
-                                                                      builder:
-                                                                          (
-                                                                            context,
-                                                                          ) =>
-                                                                              BookingScreen(),
-                                                                    ),
-                                                                  );
-                                                                }
-                                                                : () {
-                                                                  showToastMessage(
-                                                                    "Please choose a location using the search bar above to find a store and proceed with your booking.",
-                                                                  );
-                                                                },
-                                                        child: Opacity(
-                                                          opacity:
-                                                              _locationSelected
-                                                                  ? 1.0
-                                                                  : 0.5,
-                                                          child: Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                  right: 10.w,
-                                                                  left: 6.w,
-                                                                  top: 4.h,
-                                                                  bottom: 4.h,
-                                                                ),
-                                                            child: Container(
-                                                              height: 56.h,
-                                                              decoration: BoxDecoration(
-                                                                color:
-                                                                    Colors
-                                                                        .white,
-                                                                boxShadow: [
-                                                                  BoxShadow(
-                                                                    color: Colors
-                                                                        .grey
-                                                                        .withOpacity(
-                                                                          0.5,
-                                                                        ),
-                                                                    spreadRadius:
-                                                                        2.r,
-                                                                    blurRadius:
-                                                                        4.r,
-                                                                  ),
-                                                                ],
-                                                                borderRadius:
-                                                                    BorderRadius.circular(
-                                                                      4.r,
-                                                                    ),
-                                                              ),
-                                                              child: Padding(
-                                                                padding:
-                                                                    EdgeInsets.symmetric(
-                                                                      horizontal:
-                                                                          10.w,
-                                                                      vertical:
-                                                                          6.h,
-                                                                    ),
-                                                                child: Column(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .center,
-                                                                  children: [
-                                                                    Image.network(
-                                                                      service['imageUrl'],
-                                                                      fit:
-                                                                          BoxFit
-                                                                              .fitHeight,
-                                                                      width:
-                                                                          60.w,
-                                                                      errorBuilder:
-                                                                          (
-                                                                            context,
-                                                                            error,
-                                                                            stackTrace,
-                                                                          ) => Icon(
-                                                                            Icons.image_not_supported,
-                                                                            size:
-                                                                                60.w,
-                                                                            color:
-                                                                                Colors.grey,
-                                                                          ),
-                                                                    ),
-                                                                    SizedBox(
-                                                                      height:
-                                                                          12.h,
-                                                                    ),
-                                                                    Text(
-                                                                      service['name'],
-                                                                      style: TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight.w700,
-                                                                        color:
-                                                                            Colors.black,
-                                                                        letterSpacing:
-                                                                            1.w,
-                                                                        fontSize:
-                                                                            12.sp,
-                                                                      ),
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
+                                  child: Column(
+                                    children: [
+                                      Expanded(
+                                        child: ListView.builder(
+                                          shrinkWrap: true,
+                                          scrollDirection: Axis.horizontal,
+                                          physics:
+                                              const BouncingScrollPhysics(),
+                                          itemCount: _services.length,
+                                          itemBuilder: (context, index) {
+                                            final service = _services[index];
+                                            return InkWell(
+                                              onTap:
+                                                  !_noStoreFound
+                                                      ? () {
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    BookingScreen(),
                                                           ),
-                                                        ),
-                                                      );
-                                                    },
+                                                        );
+                                                      }
+                                                      : () {
+                                                        showToastMessage(
+                                                          "No laundromat found at current location. Please search for a different place.",
+                                                        );
+                                                      },
+                                              child: Opacity(
+                                                opacity:
+                                                    !_noStoreFound ? 1.0 : 0.5,
+                                                child: Padding(
+                                                  padding: EdgeInsets.only(
+                                                    right: 10.w,
+                                                    left: 6.w,
+                                                    top: 4.h,
+                                                    bottom: 4.h,
                                                   ),
-                                                ),
-                                                _locationSelected
-                                                    ? SizedBox(height: 32.h)
-                                                    : Center(
+                                                  child: Container(
+                                                    height: 56.h,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.grey
+                                                              .withOpacity(0.5),
+                                                          spreadRadius: 2.r,
+                                                          blurRadius: 4.r,
+                                                        ),
+                                                      ],
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            4.r,
+                                                          ),
+                                                    ),
+                                                    child: Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                            horizontal: 10.w,
+                                                            vertical: 6.h,
+                                                          ),
                                                       child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
                                                         children: [
+                                                          Image.network(
+                                                            service['imageUrl'],
+                                                            fit:
+                                                                BoxFit
+                                                                    .fitHeight,
+                                                            width: 60.w,
+                                                            errorBuilder:
+                                                                (
+                                                                  context,
+                                                                  error,
+                                                                  stackTrace,
+                                                                ) => Icon(
+                                                                  Icons
+                                                                      .image_not_supported,
+                                                                  size: 60.w,
+                                                                  color:
+                                                                      Colors
+                                                                          .grey,
+                                                                ),
+                                                          ),
                                                           SizedBox(
                                                             height: 12.h,
                                                           ),
                                                           Text(
+                                                            service['name'],
+                                                            style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              color:
+                                                                  Colors.black,
+                                                              letterSpacing:
+                                                                  1.w,
+                                                              fontSize: 12.sp,
+                                                            ),
                                                             textAlign:
                                                                 TextAlign
                                                                     .center,
-                                                            "Please choose a location using the search bar above to find a store and proceed with your booking.",
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors
-                                                                      .blueGrey,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                            ),
                                                           ),
                                                         ],
                                                       ),
                                                     ),
-                                              ],
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      if (_noStoreFound)
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 12.h),
+                                          child: Text(
+                                            "No laundromat found at current location. Please search for a different place.",
+                                            style: TextStyle(
+                                              color: Colors.blueGrey,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 12.sp,
                                             ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                    ],
                                   ),
                                 ),
                               ),

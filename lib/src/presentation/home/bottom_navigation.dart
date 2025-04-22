@@ -1,12 +1,14 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/home/home_screen.dart';
 import 'package:mr_blue/src/presentation/setting/settings.dart';
 import 'package:mr_blue/src/services/api_services.dart';
+import 'package:permission_handler/permission_handler.dart' as app_settings;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class Bottomnavigation extends StatefulWidget {
   const Bottomnavigation({super.key});
@@ -17,49 +19,82 @@ class Bottomnavigation extends StatefulWidget {
 
 class _BottomnavigationState extends State<Bottomnavigation> {
   int _selectedIndex = 0;
-  final List<Widget> _pages = [HomeScreen(), Setting()];
+  bool _loading = false;
+  double? _latitude;
+  double? _longitude;
+  String? _responseText;
+  List<Widget>? _pages;
   final ApiService _apiService = ApiService();
 
   @override
   void initState() {
     super.initState();
-    _fetchLocationAndPost();
+    _fetchLocationAndPost().then((_) {
+      setState(() {
+        _pages = [
+          HomeScreen(
+            initialLat: _latitude,
+            initialLng: _longitude,
+            responseText: _responseText,
+          ),
+          const Setting(),
+        ];
+      });
+    });
     _fetchAddress();
   }
 
   Future<void> _fetchAddress() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-
       String? userID = prefs.getString('user_id');
 
       if (userID != null) {
         String response = await _apiService.availableAddress(userID);
-        print('API Response _fetchAddress: $response');
         final responseBody = json.decode(response);
         final addressID = responseBody['Address']['id'].toString();
         await prefs.setString('user_address_id', addressID);
-      } else {
-        print('User id not found in SharedPreferences');
       }
     } catch (e) {
-      print('DEBUG: Error occurred: $e');
+      print('Error occurred in _fetchAddress: $e');
     }
   }
 
   Future<void> _fetchLocationAndPost() async {
     try {
+      bool permissionGranted = await _requestLocationPermission();
+      if (!permissionGranted) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('region_id', "5");
+        await prefs.setString('city_id', "2");
+        await prefs.setString('store_id', "39");
+        setState(() {
+          _latitude = null;
+          _longitude = null;
+          _responseText = "No store found in this location.";
+        });
+        return;
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      String latitude = position.latitude.toString();
+      String longitude = position.longitude.toString();
+
       SharedPreferences prefs = await SharedPreferences.getInstance();
-
-      String? latitude = prefs.getDouble('latitude').toString();
-      String? longitude = prefs.getDouble('longitude').toString();
-
-      print('DEBUG: Latitude: $latitude, Longitude: $longitude');
+      await prefs.setString('latitude', latitude);
+      await prefs.setString('longitude', longitude);
 
       String response = await _apiService.postUserLocation(latitude, longitude);
       final responseBody = jsonDecode(response);
 
-      print('DEBUG: API Response: $responseBody');
+      setState(() {
+        _latitude = position.latitude;
+        _longitude = position.longitude;
+        _responseText = responseBody['Text'] ?? '';
+      });
 
       if (responseBody['Status'] == "Success") {
         await prefs.setString(
@@ -74,7 +109,68 @@ class _BottomnavigationState extends State<Bottomnavigation> {
         await prefs.setString('store_id', "39");
       }
     } catch (e) {
-      print('DEBUG: Error occurred: $e');
+      print('Error occurred in _fetchLocationAndPost: $e');
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('region_id', "5");
+      await prefs.setString('city_id', "2");
+      await prefs.setString('store_id', "39");
+      setState(() {
+        _latitude = null;
+        _longitude = null;
+        _responseText = "No store found in this location.";
+      });
+    }
+  }
+
+  Future<bool> _requestLocationPermission() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return false;
+    }
+
+    PermissionStatus permission = await Permission.location.request();
+    if (permission.isGranted) {
+      return true;
+    } else if (permission.isPermanentlyDenied) {
+      setState(() {
+        _loading = false;
+      });
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Location Permission Required'),
+            content: const Text(
+              'Location permissions are permanently denied. Please enable location access from the app settings to proceed.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  await app_settings.openAppSettings();
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Open Settings'),
+              ),
+            ],
+          );
+        },
+      );
+
+      return Future.error(
+        'Location permissions are permanently denied, we cannot request permissions',
+      );
+    } else {
+      return false;
     }
   }
 
@@ -125,7 +221,6 @@ class _BottomnavigationState extends State<Bottomnavigation> {
             icon: Image.asset(
               "assets/images/whatsapp-icon.png",
               height: 20.h,
-
               color: Colors.white70,
             ),
             label: 'WhatsApp',
@@ -137,7 +232,10 @@ class _BottomnavigationState extends State<Bottomnavigation> {
         },
         type: BottomNavigationBarType.fixed,
       ),
-      body: _pages[_selectedIndex],
+      body:
+          _pages == null
+              ? const Center(child: CircularProgressIndicator())
+              : _pages![_selectedIndex],
     );
   }
 }
