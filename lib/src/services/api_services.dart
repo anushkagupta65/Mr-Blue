@@ -451,6 +451,34 @@ class ApiService {
     }
   }
 
+  Future<List> fetchUserBookings(String userID) async {
+    try {
+      var request = http.Request(
+        'GET',
+        Uri.parse('$_baseUrl/user-booking-list/$userID'),
+      );
+      request.headers.addAll(_getHeaders());
+
+      http.StreamedResponse response = await request.send();
+      String responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(responseBody);
+        if (jsonResponse['status'] == 'success') {
+          return jsonResponse['bookings'];
+        } else {
+          throw Exception('API returned unsuccessful status');
+        }
+      } else {
+        throw Exception(
+          'Failed: ${response.statusCode} - ${response.reasonPhrase}',
+        );
+      }
+    } catch (e) {
+      throw Exception('Error fetching bookings: $e');
+    }
+  }
+
   // ================================================================ TO HANDLE EXCEPTION ===================================================
   /// Handles errors that occur during API requests.
   Exception _handleError(dynamic error) {
