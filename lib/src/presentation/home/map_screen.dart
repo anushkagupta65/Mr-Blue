@@ -1,14 +1,13 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/home/bottom_navigation.dart';
 import 'package:mr_blue/src/presentation/schedule_pickup/screens/booking_confirmation.dart';
-import 'package:mr_blue/src/services/api_services.dart';
-import 'package:permission_handler/permission_handler.dart' as app_settings;
+import 'package:mr_blue/src/core/utils.dart';
+import 'package:flutter_google_maps_webservices/places.dart';
+import 'map_helper.dart';
+import 'dart:async';
+import 'package:uuid/uuid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MapScreen extends StatefulWidget {
@@ -20,11 +19,12 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
+  final MapHelper _mapHelper = MapHelper();
   GoogleMapController? _controller;
   bool _loading = true;
   String? _currentAddress;
   String zipCode = '';
-  int? userId;
+  String? userId;
   LatLng? _currentPosition;
   LatLng? _selectedPosition;
   final Set<Marker> _markers = {};
@@ -33,212 +33,133 @@ class _MapScreenState extends State<MapScreen> {
   List<Map<String, String>> _cities = [];
   bool _isLoadingCities = false;
   final TextEditingController _searchController = TextEditingController();
-
   TextEditingController house = TextEditingController();
   TextEditingController street = TextEditingController();
+  List<Prediction> _predictions = [];
+  bool _showSuggestions = false;
+  Timer? _debounce;
+  String _sessionToken = const Uuid().v4();
 
-  Future<void> _getUserId() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      userId = prefs.getInt('user_id');
-    });
-  }
-
-  Future<void> _getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-
-      if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied.');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      setState(() {
-        _loading = false;
-      });
-
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Location Permission Required'),
-            content: const Text(
-              'Location permissions are permanently denied. Please enable location access from the app settings to proceed.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await app_settings.openAppSettings();
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Open Settings'),
-              ),
-            ],
-          );
-        },
-      );
-
-      return Future.error(
-        'Location permissions are permanently denied, we cannot request permissions',
-      );
-    }
-
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
+  @override
+  void initState() {
+    super.initState();
+    print(
+      '[DEBUG] MapScreen: initState called, calledFrom: ${widget.calledFrom}',
     );
-
-    setState(() {
-      _currentPosition = LatLng(position.latitude, position.longitude);
-      _selectedPosition = _currentPosition;
-      _loading = false;
-      _updateMarker(_selectedPosition!);
-    });
-
-    _moveToLocation(position);
-
-    await _getAddressFromLatLng(position.latitude, position.longitude);
-  }
-
-  Future<void> _searchCity(String cityName) async {
-    try {
-      List<Location> locations = await locationFromAddress(cityName);
-      if (locations.isNotEmpty) {
-        Location location = locations.first;
-        LatLng cityPosition = LatLng(location.latitude, location.longitude);
-
+    _mapHelper.getCurrentLocation(
+      onLoading: (bool loading) {
+        print('[DEBUG] MapScreen: Location loading state: $loading');
+        setState(() => _loading = loading);
+      },
+      onPosition: (LatLng position) {
+        print(
+          '[DEBUG] MapScreen: Current position: ${position.latitude}, ${position.longitude}',
+        );
         setState(() {
-          _currentPosition = cityPosition;
-          _selectedPosition = cityPosition;
-          _updateMarker(cityPosition);
+          _currentPosition = position;
+          _selectedPosition = position;
+          _mapHelper.updateMarker(_markers, position);
         });
-
         _controller?.animateCamera(
           CameraUpdate.newCameraPosition(
-            CameraPosition(target: cityPosition, zoom: 14.0),
+            CameraPosition(target: position, zoom: 14.0),
           ),
         );
-
-        await _getAddressFromLatLng(location.latitude, location.longitude);
-      } else {
-        showToastMessage('City not found');
-      }
-    } catch (e) {
-      showToastMessage('Error searching for city: $e');
-    }
-  }
-
-  Future<void> _getAddressFromLatLng(double latitude, double longitude) async {
-    try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-        latitude,
-        longitude,
-      );
-
-      if (placemarks.isNotEmpty) {
-        Placemark place = placemarks[0];
-        String address =
-            "${place.street}, ${place.subLocality}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode} ${place.country}";
-
+      },
+      onAddress: (String address, String zip) {
+        print('[DEBUG] MapScreen: Address fetched: $address, Zip: $zip');
         setState(() {
           _currentAddress = address;
-          zipCode = place.postalCode ?? "No Zip Code";
+          zipCode = zip;
         });
-      } else {
-        setState(() {
-          _currentAddress = "Unable to fetch address";
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _currentAddress = "Unable to fetch address";
-      });
-    }
-  }
-
-  void _moveToLocation(Position position) {
-    _controller?.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: LatLng(position.latitude, position.longitude),
-          zoom: 14.0,
-        ),
-      ),
+      },
+      onError: (String message) {
+        print('[DEBUG] MapScreen: Location error: $message');
+        showToastMessage(message);
+        if (message.contains('permanently denied')) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Location Permission Required'),
+                content: const Text(
+                  'Location permissions are permanently denied. Please enable location access from the app settings to proceed.',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      await _mapHelper.openAppSettings();
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Open Settings'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      },
     );
-  }
-
-  void _moveToSelectedLocation(LatLng position) {
-    _controller?.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(target: position, zoom: 14.0),
-      ),
+    _mapHelper.getUserId((String? id) {
+      print('[DEBUG] MapScreen: User ID fetched: $id');
+      setState(() => userId = id);
+    });
+    _mapHelper.fetchCities(
+      onLoading: (bool loading) {
+        print('[DEBUG] MapScreen: Cities loading state: $loading');
+        setState(() => _isLoadingCities = loading);
+      },
+      onCities: (List<Map<String, String>> cities) {
+        print('[DEBUG] MapScreen: Cities fetched: ${cities.length} cities');
+        setState(() => _cities = cities);
+      },
+      onError: (String message) {
+        print('[DEBUG] MapScreen: Cities fetch error: $message');
+        showToastMessage(message);
+      },
     );
-  }
-
-  void _updateMarker(LatLng position) {
-    setState(() {
-      _markers.clear();
-      _markers.add(
-        Marker(
-          markerId: const MarkerId('selected_location'),
-          position: position,
-          infoWindow: const InfoWindow(title: 'Selected Location'),
-        ),
+    _searchController.addListener(() {
+      print(
+        '[DEBUG] MapScreen: Search input changed: ${_searchController.text}',
+      );
+      _mapHelper.searchPlaces(
+        _searchController.text,
+        _sessionToken,
+        (List<Prediction> predictions) {
+          print(
+            '[DEBUG] MapScreen: Place predictions received: ${predictions.length}',
+          );
+          setState(() {
+            _predictions = predictions;
+            _showSuggestions = predictions.isNotEmpty;
+          });
+        },
+        (String message) {
+          print('[DEBUG] MapScreen: Place search error: $message');
+          showToastMessage(message);
+          setState(() => _showSuggestions = false);
+        },
       );
     });
   }
 
-  Future<void> _fetchCities() async {
-    setState(() {
-      _isLoadingCities = true;
-    });
-    try {
-      String responseBody = await ApiService().fetchCities();
-      Map<String, dynamic> jsonResponse = jsonDecode(responseBody);
-      if (jsonResponse['Status'] == 'Success') {
-        List<dynamic> citiesJson = jsonResponse['Text'];
-        setState(() {
-          _cities =
-              citiesJson
-                  .map(
-                    (city) => {
-                      'name': city['name'].toString(),
-                      'id': city['id'].toString(),
-                    },
-                  )
-                  .toList();
-          _isLoadingCities = false;
-        });
-      } else {
-        throw Exception(
-          'API returned non-success status: ${jsonResponse['Status']}',
-        );
-      }
-    } catch (e) {
-      setState(() {
-        _isLoadingCities = false;
-      });
-      showToastMessage("Failed to load cities: $e");
-    }
+  @override
+  void dispose() {
+    _controller?.dispose();
+    house.dispose();
+    street.dispose();
+    _searchController.dispose();
+    _debounce?.cancel();
+    super.dispose();
   }
 
   Widget _buildCityDropdown() {
@@ -276,6 +197,7 @@ class _MapScreenState extends State<MapScreen> {
               );
             }).toList(),
         onChanged: (value) {
+          print('[DEBUG] MapScreen: City selected: $value');
           setState(() {
             _selectedCity = value;
           });
@@ -303,33 +225,16 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _getCurrentLocation();
-    _getUserId();
-    _fetchCities();
-  }
-
-  @override
-  void dispose() {
-    _controller?.dispose();
-    house.dispose();
-    street.dispose();
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.blue.shade50,
       appBar: customAppBar(
         "mr. blue",
         leading:
-            widget.calledFrom == "splash_screen" ||
-                    widget.calledFrom == "verify_otp"
+            widget.calledFrom == "verify_otp"
                 ? IconButton(
                   onPressed: () {
+                    print('[DEBUG] MapScreen: Back button pressed');
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => Bottomnavigation(),
@@ -358,47 +263,156 @@ class _MapScreenState extends State<MapScreen> {
                           horizontal: 16.w,
                           vertical: 4.h,
                         ),
-                        child: TextField(
-                          controller: _searchController,
-                          decoration: InputDecoration(
-                            hintText: 'Search for a place on maps.. ',
-                            hintStyle: TextStyle(
-                              fontSize: 8.sp,
-                              color: Colors.grey[600],
-                            ),
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.blue.shade700,
+                        child: Column(
+                          children: [
+                            TextField(
+                              controller: _searchController,
+                              decoration: InputDecoration(
+                                hintText: 'Search for a place on maps..',
+                                hintStyle: TextStyle(
+                                  fontSize: 8.sp,
+                                  color: Colors.grey[600],
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.blue.shade700,
+                                  ),
+                                  borderRadius: BorderRadius.circular(4.r),
+                                ),
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 12.w,
+                                  vertical: 7.h,
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    Icons.search,
+                                    color: Colors.blue.shade700,
+                                  ),
+                                  onPressed: () {
+                                    print(
+                                      '[DEBUG] MapScreen: Search button pressed, input: ${_searchController.text}',
+                                    );
+                                    if (_searchController.text
+                                        .trim()
+                                        .isNotEmpty) {
+                                      _mapHelper.searchPlaces(
+                                        _searchController.text.trim(),
+                                        _sessionToken,
+                                        (predictions) {
+                                          print(
+                                            '[DEBUG] MapScreen: Search predictions received: ${predictions.length}',
+                                          );
+                                          setState(() {
+                                            _predictions = predictions;
+                                            _showSuggestions =
+                                                predictions.isNotEmpty;
+                                          });
+                                        },
+                                        (message) => showToastMessage(message),
+                                      );
+                                    } else {
+                                      showToastMessage(
+                                        'Please enter a place name',
+                                      );
+                                    }
+                                  },
+                                ),
                               ),
-                              borderRadius: BorderRadius.circular(4.r),
                             ),
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 12.w,
-                              vertical: 7.h,
-                            ),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                Icons.search,
-                                color: Colors.blue.shade700,
+                            if (_showSuggestions && _predictions.isNotEmpty)
+                              SizedBox(
+                                height: 200.h,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(4.r),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black26,
+                                        blurRadius: 4.r,
+                                        offset: Offset(0, 2.h),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ListView.builder(
+                                    physics: const ClampingScrollPhysics(),
+                                    itemCount: _predictions.length,
+                                    itemBuilder: (context, index) {
+                                      final prediction = _predictions[index];
+                                      return ListTile(
+                                        title: Text(
+                                          prediction.description ?? '',
+                                          style: TextStyle(fontSize: 12.sp),
+                                        ),
+                                        onTap: () {
+                                          print(
+                                            '[DEBUG] MapScreen: Prediction selected: ${prediction.description}',
+                                          );
+                                          _mapHelper.selectPlace(
+                                            prediction,
+                                            _sessionToken,
+                                            (
+                                              LatLng position,
+                                              String address,
+                                            ) async {
+                                              print(
+                                                '[DEBUG] MapScreen: Place selected, position: ${position.latitude}, ${position.longitude}, address: $address',
+                                              );
+                                              final prefs =
+                                                  await SharedPreferences.getInstance();
+                                              await prefs.setString(
+                                                'latitude',
+                                                position.latitude.toString(),
+                                              );
+                                              await prefs.setString(
+                                                'longitude',
+                                                position.longitude.toString(),
+                                              );
+                                              setState(() {
+                                                _currentPosition = position;
+                                                _selectedPosition = position;
+                                                _mapHelper.updateMarker(
+                                                  _markers,
+                                                  position,
+                                                );
+                                                _currentAddress = address;
+                                                _showSuggestions = false;
+                                                _predictions = [];
+                                                _searchController.clear();
+                                                _sessionToken =
+                                                    const Uuid().v4();
+                                              });
+                                              _controller?.animateCamera(
+                                                CameraUpdate.newCameraPosition(
+                                                  CameraPosition(
+                                                    target: position,
+                                                    zoom: 14.0,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            (String zip) {
+                                              print(
+                                                '[DEBUG] MapScreen: Zip code updated: $zip',
+                                              );
+                                              setState(() => zipCode = zip);
+                                            },
+                                            (String message) {
+                                              print(
+                                                '[DEBUG] MapScreen: Place selection error: $message',
+                                              );
+                                              showToastMessage(message);
+                                            },
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
                               ),
-                              onPressed: () {
-                                if (_searchController.text.trim().isNotEmpty) {
-                                  _searchCity(_searchController.text.trim());
-                                } else {
-                                  showToastMessage('Please enter a city name');
-                                }
-                              },
-                            ),
-                          ),
-                          onSubmitted: (value) {
-                            if (value.trim().isNotEmpty) {
-                              _searchCity(value.trim());
-                            } else {
-                              showToastMessage('Please enter a city name');
-                            }
-                          },
+                          ],
                         ),
                       ),
                       _loading || _currentPosition == null
@@ -437,14 +451,33 @@ class _MapScreenState extends State<MapScreen> {
                                 zoom: 14.0,
                               ),
                               onTap: (LatLng position) {
+                                print(
+                                  '[DEBUG] MapScreen: Map tapped at: ${position.latitude}, ${position.longitude}',
+                                );
                                 setState(() {
                                   _selectedPosition = position;
-                                  _updateMarker(position);
+                                  _mapHelper.updateMarker(_markers, position);
                                 });
-                                _moveToSelectedLocation(position);
-                                _getAddressFromLatLng(
-                                  position.latitude,
-                                  position.longitude,
+                                _controller?.animateCamera(
+                                  CameraUpdate.newCameraPosition(
+                                    CameraPosition(
+                                      target: position,
+                                      zoom: 14.0,
+                                    ),
+                                  ),
+                                );
+                                _mapHelper.getAddressFromLatLng(
+                                  position.latitude.toString(),
+                                  position.longitude.toString(),
+                                  (address, zip) {
+                                    print(
+                                      '[DEBUG] MapScreen: Address from tap: $address, Zip: $zip',
+                                    );
+                                    setState(() {
+                                      _currentAddress = address;
+                                      zipCode = zip;
+                                    });
+                                  },
                                 );
                               },
                             ),
@@ -525,6 +558,9 @@ class _MapScreenState extends State<MapScreen> {
                                     return null;
                                   },
                                   onChanged: (value) {
+                                    print(
+                                      '[DEBUG] MapScreen: House input changed: $value',
+                                    );
                                     if (_formKey.currentState != null) {
                                       _formKey.currentState!.validate();
                                     }
@@ -555,6 +591,11 @@ class _MapScreenState extends State<MapScreen> {
                                       vertical: 12.h,
                                     ),
                                   ),
+                                  onChanged: (value) {
+                                    print(
+                                      '[DEBUG] MapScreen: Street input changed: $value',
+                                    );
+                                  },
                                 ),
                               ),
                               Padding(
@@ -568,7 +609,13 @@ class _MapScreenState extends State<MapScreen> {
                                     ),
                                   ),
                                   onPressed: () async {
+                                    print(
+                                      '[DEBUG] MapScreen: Confirm Location button pressed',
+                                    );
                                     if (_selectedPosition == null) {
+                                      print(
+                                        '[DEBUG] MapScreen: No selected position',
+                                      );
                                       showToastMessage(
                                         'Please select a location on the map',
                                       );
@@ -577,6 +624,9 @@ class _MapScreenState extends State<MapScreen> {
 
                                     bool isValid =
                                         _formKey.currentState!.validate();
+                                    print(
+                                      '[DEBUG] MapScreen: Form validation result: $isValid',
+                                    );
                                     if (!isValid) {
                                       return;
                                     }
@@ -590,6 +640,9 @@ class _MapScreenState extends State<MapScreen> {
                                     }
 
                                     if (cityId == null) {
+                                      print(
+                                        '[DEBUG] MapScreen: No city selected',
+                                      );
                                       showToastMessage('Please select a city');
                                       return;
                                     }
@@ -606,61 +659,44 @@ class _MapScreenState extends State<MapScreen> {
                                         _currentAddress!.isNotEmpty) {
                                       finalAddress += ", $_currentAddress";
                                     }
+                                    print(
+                                      '[DEBUG] MapScreen: Final address: $finalAddress',
+                                    );
 
-                                    final prefs =
-                                        await SharedPreferences.getInstance();
-                                    final userID = prefs.getString('user_id');
-
-                                    if (userID != null) {
-                                      try {
-                                        final response = await ApiService()
-                                            .updateUserAddress(
-                                              userId: userID,
-                                              cityId: cityId,
-                                              zip: zipCode,
-                                              address: _currentAddress!,
+                                    await _mapHelper.updateUserAddress(
+                                      userId: userId?.toString(),
+                                      cityId: cityId,
+                                      zipCode: zipCode,
+                                      address: _currentAddress!,
+                                      finalAddress: finalAddress,
+                                      onSuccess: () {
+                                        print(
+                                          '[DEBUG] MapScreen: Address updated successfully',
+                                        );
+                                        showToastMessage("Location confirmed");
+                                        Future.delayed(
+                                          const Duration(seconds: 2),
+                                          () {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder:
+                                                    (context) => Confirmation(
+                                                      title: "Location Added",
+                                                      desription:
+                                                          "Your new location has been added successfully: $finalAddress",
+                                                    ),
+                                              ),
                                             );
-
-                                        final responseData = jsonDecode(
-                                          response,
+                                          },
                                         );
-
-                                        if (responseData['Status'] ==
-                                            "Success") {
-                                          await prefs.setString(
-                                            'user_address',
-                                            finalAddress,
-                                          );
-
-                                          showToastMessage(
-                                            "Location confirmed",
-                                          );
-                                          await Future.delayed(
-                                            const Duration(seconds: 2),
-                                          );
-                                          Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                              builder:
-                                                  (context) => Confirmation(
-                                                    title: "Location Added",
-                                                    desription:
-                                                        "Your new location has been added successfully: $finalAddress",
-                                                  ),
-                                            ),
-                                          );
-                                        } else {
-                                          showToastMessage(
-                                            "Failed to update address: ${responseData["Text"]}",
-                                          );
-                                        }
-                                      } catch (e) {
-                                        showToastMessage(
-                                          "An error occurred while updating address",
+                                      },
+                                      onError: (String message) {
+                                        print(
+                                          '[DEBUG] MapScreen: Address update error: $message',
                                         );
-                                      }
-                                    } else {
-                                      showToastMessage("User not logged in");
-                                    }
+                                        showToastMessage(message);
+                                      },
+                                    );
                                   },
                                   child: Text(
                                     'Confirm Location',

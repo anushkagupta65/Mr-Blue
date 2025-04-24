@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mr_blue/src/presentation/home/bottom_navigation.dart';
+// import 'package:mr_blue/src/presentation/home/bottom_navigation.dart';
 import 'package:mr_blue/src/presentation/home/map_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mr_blue/src/presentation/login/login.dart';
@@ -28,27 +28,27 @@ class _SplashScreenState extends State<SplashScreen> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
-    final double? storedLat = prefs.getDouble('latitude');
-    final double? storedLong = prefs.getDouble('longitude');
+    final String? storedLat = prefs.getString('latitude');
+    final String? storedLong = prefs.getString('longitude');
     final String? userAddress = prefs.getString('user_address');
     print(
       'Stored Latitude: $storedLat, Stored Longitude: $storedLong, Address: $userAddress',
     );
 
     if (isLoggedIn) {
-      if (userAddress == null || userAddress.isEmpty) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const MapScreen(calledFrom: "splash_screen"),
-          ),
-        );
-      } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const Bottomnavigation()),
-        );
-      }
+      // if (userAddress == null || userAddress.isEmpty) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const MapScreen(calledFrom: "splash_screen"),
+        ),
+      );
+      // } else {
+      //   Navigator.pushReplacement(
+      //     context,
+      //     MaterialPageRoute(builder: (context) => const Bottomnavigation()),
+      //   );
+      // }
     } else {
       Navigator.pushReplacement(
         context,
@@ -89,8 +89,8 @@ class _SplashScreenState extends State<SplashScreen> {
         Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high,
         );
-        await prefs.setDouble('latitude', position.latitude);
-        await prefs.setDouble('longitude', position.longitude);
+        await prefs.setString('latitude', position.latitude.toString());
+        await prefs.setString('longitude', position.longitude.toString());
       } catch (e) {
         print('Error getting location: $e');
       }
@@ -164,11 +164,14 @@ class _SplashScreenState extends State<SplashScreen> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Colors.blue.shade50, Colors.blue.shade900],
+              colors: [
+                Colors.blue.shade50,
+                const Color.fromARGB(255, 1, 29, 71),
+              ],
             ),
             image: DecorationImage(
               colorFilter: ColorFilter.mode(
-                Colors.black.withOpacity(0.5),
+                Colors.black.withOpacity(0.3),
                 BlendMode.dstATop,
               ),
               image: const AssetImage("assets/images/splash_screen.png"),

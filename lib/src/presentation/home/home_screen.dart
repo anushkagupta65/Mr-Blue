@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/drawer/drawer.dart';
-import 'package:mr_blue/src/presentation/home/helper_methods.dart';
+import 'package:mr_blue/src/presentation/home/home_helper.dart';
 import 'package:mr_blue/src/presentation/home/map_screen.dart';
 import 'package:mr_blue/src/presentation/schedule_pickup/schedule_pickup.dart';
 import 'package:flutter_google_maps_webservices/places.dart';
 
 class HomeScreen extends StatefulWidget {
-  final double? initialLat;
-  final double? initialLng;
+  final String? initialLat;
+  final String? initialLng;
   final String? responseText;
 
   const HomeScreen({
@@ -345,19 +345,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                           },
                                         ),
                                       ),
-                                      if (_noStoreFound)
-                                        Padding(
-                                          padding: EdgeInsets.only(top: 12.h),
-                                          child: Text(
-                                            "No laundromat found at current location. Please search for a different place.",
-                                            style: TextStyle(
-                                              color: Colors.blueGrey,
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 12.sp,
+                                      _noStoreFound
+                                          ? Padding(
+                                            padding: EdgeInsets.only(top: 12.h),
+                                            child: Text(
+                                              "No laundromat found at current location. Please search for a different place.",
+                                              style: TextStyle(
+                                                color: Colors.blueGrey,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 12.sp,
+                                              ),
+                                              textAlign: TextAlign.center,
                                             ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
+                                          )
+                                          : SizedBox(height: 32.h),
                                     ],
                                   ),
                                 ),

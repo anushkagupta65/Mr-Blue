@@ -13,11 +13,12 @@ val keystoreProperties = Properties().apply {
     }
 }
 
-println("Keystore File: ${keystoreProperties.getProperty("storeFile")}")
-println("Store Password: ${keystoreProperties.getProperty("storePassword")}")
-println("Key Alias: ${keystoreProperties.getProperty("keyAlias")}")
-println("Key Password: ${keystoreProperties.getProperty("keyPassword")}")
-
+val localPropertiesFile = file("../local.properties")
+val localProperties = Properties().apply {
+    if (localPropertiesFile.exists()) {
+        load(localPropertiesFile.inputStream())
+    }
+}
 
 android {
     namespace = "com.mrblue"
@@ -39,6 +40,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        resValue("string", "google_maps_key", localProperties.getProperty("MAPS_API_KEY") ?: "")
     }
 
     signingConfigs {
@@ -53,15 +55,14 @@ android {
     buildTypes {
         named("release") {
             signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = true           // or false if you don't want shrinking
-            isShrinkResources = true         // or false if you're skipping shrinking
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
     }
-
 }
 
 flutter {

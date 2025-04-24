@@ -18,8 +18,10 @@ class HelperMethods {
   String _displayAddress = "Add Location";
   List<Prediction> _predictions = [];
   bool _showSuggestions = false;
-  double? _selectedLat;
-  double? _selectedLng;
+  // ignore: unused_field
+  String? _selectedLat;
+  // ignore: unused_field
+  String? _selectedLng;
   Timer? _debounce;
   String _sessionToken = const Uuid().v4();
   bool _noStoreFound = false;
@@ -35,8 +37,8 @@ class HelperMethods {
   onPredictionsUpdated;
 
   HelperMethods({
-    double? initialLat,
-    double? initialLng,
+    String? initialLat,
+    String? initialLng,
     String? responseText,
   }) {
     _selectedLat = initialLat;
@@ -76,7 +78,7 @@ class HelperMethods {
       String response = await _apiService.getServices();
       Map<String, dynamic> responseData = jsonDecode(response);
       List<dynamic> servicesData = responseData['services'] ?? [];
-      print('Services Data: $servicesData');
+      // print('Services Data: $servicesData');
       _services =
           servicesData
               .map(
@@ -89,7 +91,7 @@ class HelperMethods {
       _isLoading = false;
       onServicesUpdated?.call(_services, _isLoading, _noStoreFound);
     } catch (e) {
-      print('Error fetching services: $e');
+      // print('Error fetching services: $e');
       _isLoading = false;
       showToastMessage('Failed to load services');
       onServicesUpdated?.call(_services, _isLoading, _noStoreFound);
@@ -134,7 +136,7 @@ class HelperMethods {
         _showSuggestions = true;
         onPredictionsUpdated?.call(_predictions, _showSuggestions);
       } catch (e) {
-        print('Error searching places: $e');
+        // print('Error searching places: $e');
         showToastMessage('Failed to search places');
         _showSuggestions = false;
         onPredictionsUpdated?.call(_predictions, _showSuggestions);
@@ -152,8 +154,8 @@ class HelperMethods {
       final lng = detail.result.geometry?.location.lng;
 
       if (lat != null && lng != null) {
-        _selectedLat = lat;
-        _selectedLng = lng;
+        _selectedLat = lat.toString();
+        _selectedLng = lng.toString();
         _displayAddress = prediction.description ?? "Add Location";
         _searchController.clear();
         _predictions = [];
@@ -162,16 +164,16 @@ class HelperMethods {
         onPredictionsUpdated?.call(_predictions, _showSuggestions);
         await _saveAddress(_displayAddress);
         onAddressUpdated?.call(_displayAddress);
-        print('Selected Location: Latitude: $lat, Longitude: $lng');
+        // print('Selected Location: Latitude: $lat, Longitude: $lng');
 
         try {
           String response = await _apiService.postUserLocation(
             lat.toString(),
             lng.toString(),
           );
-          print(
-            '========================= API Response ========================: $response',
-          );
+          // print(
+          //   '========================= API Response ========================: $response',
+          // );
           final responseBody = jsonDecode(response);
           final responseText = responseBody['Text'] ?? '';
           showToastMessage(responseText);
@@ -183,14 +185,14 @@ class HelperMethods {
           }
           onServicesUpdated?.call(_services, _isLoading, _noStoreFound);
         } catch (e) {
-          print('Error posting user location: $e');
+          // print('Error posting user location: $e');
           showToastMessage('Failed to send location to server');
         }
       } else {
         showToastMessage('Could not retrieve coordinates');
       }
     } catch (e) {
-      print('Error fetching place details: $e');
+      // print('Error fetching place details: $e');
       showToastMessage('Failed to fetch place details');
     }
   }

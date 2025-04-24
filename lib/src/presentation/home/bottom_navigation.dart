@@ -5,10 +5,7 @@ import 'package:mr_blue/src/core/utils.dart';
 import 'package:mr_blue/src/presentation/home/home_screen.dart';
 import 'package:mr_blue/src/presentation/setting/settings.dart';
 import 'package:mr_blue/src/services/api_services.dart';
-import 'package:permission_handler/permission_handler.dart' as app_settings;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class Bottomnavigation extends StatefulWidget {
   const Bottomnavigation({super.key});
@@ -19,9 +16,8 @@ class Bottomnavigation extends StatefulWidget {
 
 class _BottomnavigationState extends State<Bottomnavigation> {
   int _selectedIndex = 0;
-  bool _loading = false;
-  double? _latitude;
-  double? _longitude;
+  String? _latitude;
+  String? _longitude;
   String? _responseText;
   List<Widget>? _pages;
   final ApiService _apiService = ApiService();
@@ -29,7 +25,8 @@ class _BottomnavigationState extends State<Bottomnavigation> {
   @override
   void initState() {
     super.initState();
-    _fetchLocationAndPost().then((_) {
+    // print('[Bottomnavigation] initState: Initializing and fetching data');
+    _fetchDataAndPost().then((_) {
       setState(() {
         _pages = [
           HomeScreen(
@@ -39,6 +36,9 @@ class _BottomnavigationState extends State<Bottomnavigation> {
           ),
           const Setting(),
         ];
+        // print(
+        //   '[Bottomnavigation] initState: Pages set with latitude: $_latitude, longitude: $_longitude, responseText: $_responseText',
+        // );
       });
     });
     _fetchAddress();
@@ -48,51 +48,43 @@ class _BottomnavigationState extends State<Bottomnavigation> {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? userID = prefs.getString('user_id');
+      // print('[Bottomnavigation] _fetchAddress: userID = $userID');
 
       if (userID != null) {
         String response = await _apiService.availableAddress(userID);
+        // print('[Bottomnavigation] _fetchAddress: API response: $response');
         final responseBody = json.decode(response);
         final addressID = responseBody['Address']['id'].toString();
         await prefs.setString('user_address_id', addressID);
+        // print('[Bottomnavigation] _fetchAddress: Saved addressID: $addressID');
       }
     } catch (e) {
-      print('Error occurred in _fetchAddress: $e');
+      // print('[Bottomnavigation] _fetchAddress: Error occurred: $e');
     }
   }
 
-  Future<void> _fetchLocationAndPost() async {
+  Future<void> _fetchDataAndPost() async {
     try {
-      bool permissionGranted = await _requestLocationPermission();
-      if (!permissionGranted) {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String latitude = prefs.getString('latitude') ?? "";
+      String longitude = prefs.getString('longitude') ?? "";
+      // print(
+      //   '[Bottomnavigation] _fetchDataAndPost: latitude = $latitude, longitude = $longitude',
+      // );
+
+      // ignore: unnecessary_null_comparison
+      if (latitude == null || longitude == null) {
         await prefs.setString('region_id', "5");
         await prefs.setString('city_id', "2");
         await prefs.setString('store_id', "39");
-        setState(() {
-          _latitude = null;
-          _longitude = null;
-          _responseText = "No store found in this location.";
-        });
         return;
       }
-
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-
-      String latitude = position.latitude.toString();
-      String longitude = position.longitude.toString();
-
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('latitude', latitude);
-      await prefs.setString('longitude', longitude);
-
       String response = await _apiService.postUserLocation(latitude, longitude);
+      // print('[Bottomnavigation] _fetchDataAndPost: API response: $response');
       final responseBody = jsonDecode(response);
-
       setState(() {
-        _latitude = position.latitude;
-        _longitude = position.longitude;
+        _latitude = latitude;
+        _longitude = longitude;
         _responseText = responseBody['Text'] ?? '';
       });
 
@@ -103,74 +95,16 @@ class _BottomnavigationState extends State<Bottomnavigation> {
         );
         await prefs.setString('city_id', responseBody['city_id'].toString());
         await prefs.setString('store_id', responseBody['store_id'].toString());
+        // print(
+        //   '[Bottomnavigation] _fetchDataAndPost: Success - Saved region_id=${responseBody['region_id']}, city_id=${responseBody['city_id']}, store_id=${responseBody['store_id']}',
+        // );
       } else {
         await prefs.setString('region_id', "5");
         await prefs.setString('city_id', "2");
         await prefs.setString('store_id', "39");
       }
     } catch (e) {
-      print('Error occurred in _fetchLocationAndPost: $e');
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('region_id', "5");
-      await prefs.setString('city_id', "2");
-      await prefs.setString('store_id', "39");
-      setState(() {
-        _latitude = null;
-        _longitude = null;
-        _responseText = "No store found in this location.";
-      });
-    }
-  }
-
-  Future<bool> _requestLocationPermission() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return false;
-    }
-
-    PermissionStatus permission = await Permission.location.request();
-    if (permission.isGranted) {
-      return true;
-    } else if (permission.isPermanentlyDenied) {
-      setState(() {
-        _loading = false;
-      });
-
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Location Permission Required'),
-            content: const Text(
-              'Location permissions are permanently denied. Please enable location access from the app settings to proceed.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await app_settings.openAppSettings();
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Open Settings'),
-              ),
-            ],
-          );
-        },
-      );
-
-      return Future.error(
-        'Location permissions are permanently denied, we cannot request permissions',
-      );
-    } else {
-      return false;
+      // print('[Bottomnavigation] _fetchDataAndPost: Error occurred: $e');
     }
   }
 
