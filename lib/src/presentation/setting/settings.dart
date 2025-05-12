@@ -64,9 +64,7 @@ class _SettingState extends State<Setting> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => MapScreen(calledFrom: "setting"),
-                    ),
+                    MaterialPageRoute(builder: (context) => MapScreen()),
                   );
                 },
                 child: ListTile(

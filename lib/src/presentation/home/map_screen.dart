@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:mr_blue/src/presentation/home/bottom_navigation.dart';
 import 'package:mr_blue/src/presentation/schedule_pickup/screens/booking_confirmation.dart';
 import 'package:mr_blue/src/core/utils.dart';
 import 'package:flutter_google_maps_webservices/places.dart';
@@ -11,8 +10,7 @@ import 'package:uuid/uuid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MapScreen extends StatefulWidget {
-  final String calledFrom;
-  const MapScreen({super.key, required this.calledFrom});
+  const MapScreen({super.key});
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -43,9 +41,7 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
-    print(
-      '[DEBUG] MapScreen: initState called, calledFrom: ${widget.calledFrom}',
-    );
+    print('[DEBUG] MapScreen: initState called');
     _mapHelper.getCurrentLocation(
       onLoading: (bool loading) {
         print('[DEBUG] MapScreen: Location loading state: $loading');
@@ -228,26 +224,7 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.blue.shade50,
-      appBar: customAppBar(
-        "mr. blue",
-        leading:
-            widget.calledFrom == "verify_otp"
-                ? IconButton(
-                  onPressed: () {
-                    print('[DEBUG] MapScreen: Back button pressed');
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => Bottomnavigation(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white,
-                  ),
-                )
-                : null,
-      ),
+      appBar: customAppBar("mr. blue"),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {

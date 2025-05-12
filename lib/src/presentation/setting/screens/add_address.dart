@@ -382,10 +382,7 @@ class _AddressScreenState extends State<AddressScreen> {
                                   onPressed: () {
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
-                                        builder:
-                                            (context) => MapScreen(
-                                              calledFrom: "add_address",
-                                            ),
+                                        builder: (context) => MapScreen(),
                                       ),
                                     );
                                   },

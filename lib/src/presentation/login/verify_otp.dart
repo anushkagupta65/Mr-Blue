@@ -18,50 +18,76 @@ class VerifyOtpScreen extends StatefulWidget {
 
 class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
   String _otp = "";
+  bool _isLoading = false;
   final ApiService apiService = ApiService();
 
   Future<void> _verifyOtp() async {
     debugPrint(
       'Verifying OTP for userId: ${widget.userId}, entered OTP: $_otp',
     );
+
+    // Validate OTP length
+    if (_otp.length != 4) {
+      showToastMessage("Please enter a valid 4-digit OTP");
+      return;
+    }
+
+    setState(() => _isLoading = true);
     try {
+      // Call the API to verify OTP
       String response = await apiService.verifyOtp(widget.userId, _otp);
       debugPrint('API Response: $response');
 
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isLoggedIn', true);
-      Map<String, dynamic> userData = jsonDecode(response);
-      await prefs.setString('user_name', userData['name'] ?? 'User');
-      await prefs.setString('user_id', userData['user_id'].toString());
-      await prefs.setString(
-        'user_email',
-        userData['email'] ?? 'example@gmail.com',
-      );
-      await prefs.setString('user_mobile', userData['mobile'] ?? '');
-      debugPrint('Login status and user data saved');
+      // Parse the response
+      Map<String, dynamic> responseData = jsonDecode(response);
 
-      String? userAddress = prefs.getString('user_address');
+      // Check if the response indicates success
+      if (responseData['Status'] == 'Success') {
+        // Save user data to SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isLoggedIn', true);
+        await prefs.setString('user_name', responseData['name'] ?? 'User');
+        await prefs.setString('user_id', responseData['user_id'].toString());
+        await prefs.setString(
+          'user_email',
+          responseData['email'] ?? 'example@gmail.com',
+        );
+        await prefs.setString('user_mobile', responseData['mobile'] ?? '');
+        debugPrint('Login status and user data saved');
 
-      if (mounted) {
-        if (userAddress == null || userAddress.isEmpty) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const MapScreen(calledFrom: "verify_otp"),
-            ),
+        // Check user address and navigate accordingly
+        String? userAddress = prefs.getString('user_address');
+        if (mounted) {
+          if (userAddress == null || userAddress.isEmpty) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const MapScreen()),
+            );
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const Bottomnavigation()),
+            );
+            debugPrint('Navigated to Bottomnavigation');
+          }
+        }
+      } else {
+        // Handle invalid OTP or API error response
+        if (mounted) {
+          showToastMessage(
+            responseData['message'] ?? "Invalid OTP. Please try again.",
           );
-        } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const Bottomnavigation()),
-          );
-          debugPrint('Navigated to Bottomnavigation');
         }
       }
     } catch (e) {
+      // Handle any exceptions (e.g., network errors, JSON parsing issues)
       debugPrint('Error verifying OTP: $e');
       if (mounted) {
-        showToastMessage("Please enter a valid OTP");
+        showToastMessage("An error occurred. Please try again.");
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -85,7 +111,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                 Colors.black.withOpacity(0.5),
                 BlendMode.dstATop,
               ),
-              image: AssetImage("assets/images/login_screen.png"),
+              image: const AssetImage("assets/images/login_screen.png"),
               fit: BoxFit.cover,
             ),
           ),
@@ -156,7 +182,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                       ),
                       SizedBox(height: 50.h),
                       ElevatedButton(
-                        onPressed: _verifyOtp,
+                        onPressed: _isLoading ? null : _verifyOtp,
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.black,
                           backgroundColor: Colors.white,
@@ -169,15 +195,27 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                             horizontal: 50.w,
                           ),
                         ),
-                        child: Text(
-                          'SUBMIT',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black,
-                            letterSpacing: 1,
-                            fontSize: 14.sp,
-                          ),
-                        ),
+                        child:
+                            _isLoading
+                                ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.black,
+                                    ),
+                                  ),
+                                )
+                                : Text(
+                                  'SUBMIT',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.black,
+                                    letterSpacing: 1,
+                                    fontSize: 14.sp,
+                                  ),
+                                ),
                       ),
                     ],
                   ),

@@ -39,9 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
       // if (userAddress == null || userAddress.isEmpty) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => const MapScreen(calledFrom: "splash_screen"),
-        ),
+        MaterialPageRoute(builder: (context) => const MapScreen()),
       );
       // } else {
       //   Navigator.pushReplacement(
